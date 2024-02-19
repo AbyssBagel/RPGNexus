@@ -2,8 +2,13 @@
     box-sizing: border-box
 }
 
-hr.new {
+hr.style1 {
     border: 3px solid green;
+    border-radius: 5px;
+  }
+
+hr.style2 {
+    border: 3px solid red;
     border-radius: 5px;
   }
 
@@ -31,6 +36,15 @@ hr.new {
     margin-left: auto;
 }
 
+.col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-left: 15px;
+    padding-right: 15px;
+    position: relative;
+    width: 50%;
+}
+
 .col-12 {
     flex: 0 0 100%;
     max-width: 100%;
@@ -40,8 +54,16 @@ hr.new {
     width: 100%;
 }
 
+.order-0 {
+    order: 0;
+}
+
 .order-1 {
     order: 1;
+}
+
+.order-2 {
+    order: 2;
 }
 
 .d-block {
