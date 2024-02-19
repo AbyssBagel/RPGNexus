@@ -12,6 +12,12 @@ hr.style2 {
     border-radius: 5px;
   }
 
+.up-row{
+    display: flex;
+    flex-basis: auto;
+    flex-direction: row;
+}
+
 .row {
     display: flex;
     flex-wrap: wrap;
@@ -21,6 +27,10 @@ hr.style2 {
 
 .text-center {
     text-align: center!important;
+}
+
+.text-right {
+    text-align: right!important;
 }
 
 .py-3 {
