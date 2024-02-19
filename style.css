@@ -18,6 +18,13 @@ hr.style2 {
     flex-direction: row;
 }
 
+.up-row-collapse{
+    align-items: center;
+    flex-grow: 1;
+    display: flex;
+    justify-content: space-between!important;
+}
+
 .row {
     display: flex;
     flex-wrap: wrap;
@@ -79,4 +86,3 @@ hr.style2 {
 .d-block {
     display: block!important;
 }
-
