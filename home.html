@@ -16,7 +16,12 @@
                             </a>
                         </ul>
                         <ul class="login order-1" style="padding-left: 0px;padding-right: 20px;">
-                            <a href="login.html">Login</a>
+                            <li class="dropdown">
+                                <button onclick="loginMenu()" class="dropbtn">Login</button>
+                                <div id="loginMenu" class="login-content">
+                                    <a href="login.html">Login</a>
+                                    <a href="register.html">Register</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -24,19 +29,39 @@
         </div>
         <hr class="style1">
         <div class="header-bottom">
-            <nav>
-                <ul>
-                    <li><a href="home.html">Home</a></li>
-                    <li><a href="about.html">About</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </nav>
+            <div class="container">
+                <div class="navbar">
+                    <a href="404.html">Home</a>
+                    <a href="404.html">2</a>
+                    <a href="404.html">3</a>
+                    <div class="dropdown2">
+                        <button class="dropbtn2">4drop
+                            <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="404.html">link1</a>
+                            <a href="404.html">link2</a>
+                            <a href="404.html">link3</a>
+                        </div>
+                    </div>
+                </div>
+            </div>    
         </div>
     </header>
 
     <main>
-        <h2>About</h2>
-        <p>This is a simple website created using HTML.</p>
+        <h2>Lorem ipsum</h2>
+        <p>
+
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam a mollis nisi, non sollicitudin erat. Aenean rhoncus ipsum ut feugiat dapibus. Cras vitae lobortis ligula, vitae placerat dui. Praesent ligula velit, vehicula ut consequat eget, pretium a velit. Vestibulum lacinia neque sed sollicitudin pharetra. Proin feugiat est nec ligula aliquam, at cursus nulla feugiat. Cras ac enim a nibh finibus finibus. Nam ante nunc, euismod ac lectus vel, feugiat molestie ligula. Praesent aliquet vitae orci pulvinar varius. Nulla at purus consequat, condimentum nibh nec, consequat diam. Duis elementum massa vitae interdum cursus. In hac habitasse platea dictumst. Integer velit turpis, convallis in ligula convallis, porttitor feugiat erat. Mauris ullamcorper arcu quis massa sollicitudin, non ultricies purus elementum. Nulla suscipit placerat mollis.
+            
+            Donec facilisis metus elit, ac rutrum ipsum luctus in. Nulla vehicula dolor mattis nunc sollicitudin egestas. Aliquam sit amet blandit justo, in euismod nunc. Nullam porttitor, turpis id semper fringilla, quam libero congue nisi, eu facilisis neque ligula vel lacus. Donec non diam et mi malesuada molestie eu ut nisi. Suspendisse id blandit mauris. Nullam et felis vel sem tempus porta et non dui. Fusce a felis quis erat consectetur vestibulum. Cras non molestie metus. Ut consectetur scelerisque cursus. Praesent at leo eget massa efficitur vulputate eu ac lacus. In ac nulla eu purus eleifend faucibus. Nullam dui metus, efficitur et turpis ut, vehicula elementum elit. Integer eleifend est ut tellus posuere, vitae placerat massa imperdiet.
+            
+            Quisque mi odio, luctus et libero eget, imperdiet suscipit velit. Vestibulum feugiat tellus vitae enim convallis, quis condimentum magna auctor. Nunc interdum tellus non nunc ornare bibendum. In volutpat justo sed quam lacinia, et euismod nisl blandit. Aliquam iaculis nulla congue, volutpat velit vitae, efficitur arcu. Aliquam facilisis metus in tellus cursus aliquet. Phasellus dapibus scelerisque magna, id tempus lectus.
+            
+            Duis id diam metus. Donec augue nisl, volutpat vel neque id, posuere vulputate lectus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque id bibendum leo. Curabitur vulputate, enim vitae venenatis posuere, massa nisl consectetur risus, vel lacinia nisl orci vel turpis. Praesent a libero non tellus tristique elementum. Sed ut aliquam risus. Sed quis suscipit diam. Pellentesque vitae mauris at arcu volutpat dapibus sed sed elit.
+            
+            Morbi accumsan feugiat libero, vitae lacinia tellus vehicula et. Ut varius tincidunt risus, et fermentum elit ullamcorper ac. Praesent ac nisi eu risus accumsan efficitur eu vitae lectus. Morbi porta elit sit amet ipsum cursus, sed rutrum elit maximus. Proin scelerisque, diam vitae luctus porttitor, magna nunc ullamcorper nibh, a aliquet ligula leo accumsan neque. Aenean eleifend sodales augue eu hendrerit. Morbi eget augue tortor. Morbi et pulvinar eros. Vivamus commodo dui in dolor luctus dapibus. Vestibulum lacinia dolor dui, at rutrum massa commodo quis. Aliquam vulputate, enim vel gravida dignissim, felis turpis maximus tortor, a facilisis lacus mauris sit amet nunc. Morbi a lectus commodo, interdum ipsum et, suscipit ex. In lobortis tempor dolor ac tempor. Phasellus ut aliquet neque. Vestibulum lorem nisi, aliquam id tristique sit amet, rutrum gravida turpis. </p>
     </main>
 
     <footer id="footer" class="footer">
@@ -59,5 +84,7 @@
             </div>
         </div>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
