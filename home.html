@@ -21,12 +21,16 @@
                             </a>
                         </ul>
                         <ul class="login order-1" style="padding-left: 0px;padding-right: 50px;">
-                            <li class="dropdown">
-                                <button onclick="loginMenu()" class="dropbtn">Login</button>
-                                <div id="loginMenu" class="login-content">
-                                    <a href="login.html">Login</a>
-                                    <a href="404.html">Register</a>
-                            </li>
+                            <!--{% if user.is_authenticated %}
+                                <a href="404.html">{{ user.id }}</a>
+                            {% else %}-->
+                                <li class="dropdown">
+                                    <button onclick="loginMenu()" class="dropbtn">Login</button>
+                                    <div id="loginMenu" class="login-content">
+                                        <a href="login.html">Login</a>
+                                        <a href="404.html">Register</a>
+                                </li>
+                            <!--{% endif %}-->
                         </ul>
                     </div>
                 </div>
