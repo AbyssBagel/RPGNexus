@@ -19,6 +19,10 @@ app.get('/login', (req, res) => {
   res.sendFile('login.html', { root: __dirname });
 });
 
+app.get('/test', (req, res) => {
+  res.sendFile('test.html', { root: __dirname });
+});
+
 // Start the server
 const port = 3000;
 app.listen(port, () => {
