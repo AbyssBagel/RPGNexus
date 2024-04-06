@@ -6,7 +6,7 @@ function fillPdf() {
   try {
     var fields = {};
     var field_names = list_fields(pdfBuffer);
-    var field_values = ['Aa', '123', 'Bb'];
+    var field_values = [['Aa'], ['123'],['Bb']];
 
     for (var i = 0; i < field_names.length; i++) {
       fields[field_names[i]] = field_values[i];

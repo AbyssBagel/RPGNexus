@@ -1,0 +1,1377 @@
+//////////////////// minipdf.js////////////////////
+var minipdf = (function() {
+    'use strict';
+    
+    var Name = function (name) {
+        this.name = name;
+    };
+    function isName(obj) {
+        return obj instanceof Name;
+    }
+    var Dict = function (map) {
+        this.map = map;
+    };
+    function isDict(obj) {
+        return obj instanceof Dict;
+    }
+    var Stream = function(map, content) {
+        this.map = map;
+        this.content = content;
+        this.dict = new Dict(map);
+    };
+    // pdf.js compatibility
+    Stream.prototype.getBytes = function() {
+        return this.content;
+    };
+    function newStream(map, content) {
+        assert(content instanceof Uint8Array, 'stream content must be an Uint8Array');
+        return new Stream(map, content);
+    }
+    function isStream(obj) {
+        return obj instanceof Stream;
+    }
+    var Ref = function(num, gen) {
+        this.num = num;
+        this.gen = gen;
+    };
+    function isRef(obj) {
+        return obj instanceof Ref;
+    }
+    
+    function isBool(obj) {
+        return typeof obj == 'boolean';
+    }
+    function isNull(obj) {
+        return obj === null;
+    }
+    function isString(obj) {
+        return typeof obj == 'string';
+    }
+    function isNum(obj) {
+        return typeof obj == 'number';
+    }
+    function isArray(obj) {
+        return obj instanceof Array;
+    }
+    
+    function assert(x, msg) {
+        if (x) {
+            return;
+        }
+        if (!msg) {
+            msg = 'Assertion failed';
+        }
+        throw new Error(msg);
+    }
+    
+    function str2buf(s) {
+        var uint = new Uint8Array(s.length);
+        for(var i=0,slen=s.length;i < slen;i++){
+            uint[i] = s.charCodeAt(i);
+        }
+        return uint;
+    }
+    
+    function png_filter(content, columns) {
+        var cols = columns + 1;
+        var rows = content.length / cols;
+        assert(rows % 1 === 0, 'Invalid column value ' + cols + ' for image width ' + content.length);
+        var res = new Uint8Array(columns * rows);
+        for (var y = 0;y < rows;y++) {
+            var x;
+            var filter = content[y * cols];
+    
+            if (filter === 0) {
+                for (x = 0;x < columns;x++) {
+                    res[y * columns + x] = content[y * cols + 1 + x];
+                }
+            } else if (filter === 2) {
+                for (x = 0;x < columns;x++) {
+                    var prev = (y === 0) ? 0 : res[(y - 1) * columns + x];
+                    res[y * columns + x] = (prev + content[y * cols + 1 + x]) & 0xff;
+                }
+            } else {
+                throw new Error('Unsupported PNG filter ' + filter);
+            }
+        }
+        return res;
+    }
+    
+    
+    function _merge_xrefs(xref_table, prev) {
+        var len = Math.max(xref_table.length, prev.length);
+        for (var i = 1;i < len;i++) {
+            if (!prev[i]) {
+                continue;
+            }
+            if (!xref_table[i]) {
+                xref_table[i] = prev[i];
+            }
+        }
+    }
+    
+    
+    function inflate(content, params_map) {
+        var columns;
+        var predictor = 1;
+        if (params_map) {
+            predictor = params_map.Predictor;
+            columns = params_map.Columns;
+            if (params_map.Colors) {
+                if (params_map.Colors != 1) {
+                    throw new Error('Unsupported predictor Colors value: ' + params_map.Colors);
+                }
+            }
+            if (params_map.BitsPerComponent) {
+                if (params_map.BitsPerComponent != 8) {
+                    throw new Error('Unsupported predictor BitsPerComponent value: ' + params_map.BitsPerComponent);
+                }
+            }
+        }
+    
+        var res = pako.inflate(content);
+        if (predictor == 1) {
+            return res;
+        }
+    
+        assert(columns > 0, 'columns must be set for PNG predictors');
+    
+        if ((predictor >= 10) && (predictor <= 15)) {
+            res = png_filter(res, columns);
+        } else {
+            throw new Error('Unsupported predictor ' + predictor);
+        }
+        return res;
+    }
+    
+    function parse(buf) {
+        return new PDFDocument(buf);
+    }
+    
+    var PDFDocument = function(buf) {
+        this._cached_object_streams = {};
+    
+        this.buf = buf;
+        this.reader = new PDFReader(buf);
+    
+        check_header(buf);
+        this.startXRef = find_startxref(buf);
+        this.reader.pos = this.startXRef;
+    
+        var xref_res = this.reader.parse_xref();
+        this.xref = xref_res.xref;
+        assert(isArray(this.xref));
+        this.meta = xref_res.meta;
+        assert(this.meta.Root, 'meta.Root missing');
+        assert(isRef(this.meta.Root), 'meta.root should be Ref');
+    
+        this.root = this.fetch(this.meta.Root);
+        this.xref_type = this.reader.xref_type;
+    
+        var af_node = this.get_acroform_ref();
+        if (isRef(af_node)) {
+            this.acroForm = this.fetch(af_node);
+        } else {
+            this.acroForm = af_node;
+        }
+    };
+    PDFDocument.prototype.get_root_id = function() {
+        return this.meta.Root.num;
+    };
+    PDFDocument.prototype.get_xref_entries = function() {
+        return this.xref;
+    };
+    PDFDocument.prototype.get_acroform_ref = function() {
+        return this.root.map.AcroForm;
+    };
+    PDFDocument.prototype.fetch = function(ref, recursive) {
+        assert(ref instanceof Ref);
+    
+        var xref_entry = this.xref[ref.num];
+        if (! xref_entry) {
+            throw new Error('Cannot find object ' + ref.num + ' in xref table');
+        }
+        if (xref_entry.type === 0) {
+            throw new Error('Cannot fetch a free object');
+        }
+        if (xref_entry.type == 2) {
+            if (recursive) {
+                throw new Error('Cannot fetch object stream inside object stream');
+            }
+            if (ref.gen !== 0) {
+                throw new Error('Object with reference ' + ref.gen + ' cannot be found in object stream');
+            }
+            var object_stream = this._cached_object_streams[xref_entry.offset];
+            if (! object_stream) {
+                var object_stream_obj = this.fetch(new Ref(xref_entry.offset, 0), true);
+                object_stream = parse_object_stream(object_stream_obj);
+                this._cached_object_streams[xref_entry.offset] = object_stream;
+            }
+            if (! (ref.num in object_stream)) {
+                throw new Error(
+                    'Could not find object ' + ref.num +
+                    ' in object stream with entries ' + JSON.stringify(Object.keys(object_stream)));
+            }
+            var res = object_stream[ref.num];
+            return res;
+        }
+        if (ref.gen != xref_entry.gen) {
+            throw new Error('Invalid generation: Asked for ' + ref.gen + ', table has ' + xref_entry.gen);
+        }
+        this.reader.pos = xref_entry.offset;
+    
+        var obj = this.reader.parse_object();
+        if (obj.num !== ref.num) {
+            throw new Error('Expected to read object with ID ' + ref.num + ', but found ' + obj.num);
+        }
+        if (obj.gen !== ref.gen) {
+            throw new Error('Expected to read object with gen ' + ref.gen + ', but found ' + obj.gen);
+        }
+        return obj.obj;
+    };
+    
+    var PDFReader = function(buf) {
+        assert(buf instanceof Uint8Array, 'Expected a buffer of type Uint8Array');
+        assert(buf.BYTES_PER_ELEMENT === 1, 'not a Uint8Array!');
+        this.buf = buf;
+        this.pos = 0;
+    };
+    PDFReader.prototype = {
+        skip_space: function() {
+            while (this.pos < this.buf.length) {
+                var c = this.buf[this.pos];
+                if ((c == 9) || (c == 10) || (c == 13) || (c == 32)) {
+                    this.pos++;
+                } else {
+                    break;
+                }
+            }
+        },
+        skip_start: function(str) {
+            if (startswith(this.buf, this.pos, str)) {
+                this.pos += str.length;
+                return true;
+            }
+            return false;
+        },
+        read_uint: function(len) {
+            var res = 0;
+            while(len > 0) {
+                assert(this.buf[this.pos] !== undefined, 'reading uint at position ' + this.pos + ' of ' + this.buf.length);
+                res = (res << 8 | (this.buf[this.pos] & 0xff)) >>> 0;
+                this.pos++;
+                len--;
+            }
+            return res;
+        },
+        parse_string: function() {
+            var res = '';
+            var parens = 1;
+            while (this.pos < this.buf.length) {
+                var c = String.fromCharCode(this.buf[this.pos]);
+                this.pos++;
+                if (c == ')') {
+                    parens--;
+                    if (parens === 0) {
+                        break;
+                    }
+                    res += c;
+                } else if (c == '(') {
+                    parens++;
+                    res += c;
+                } else if (c == '\\') {
+                    c = String.fromCharCode(this.buf[this.pos]);
+                    this.pos++;
+                    switch(c) {
+                    case 'n':
+                        res += '\n';
+                        break;
+                    case 'r':
+                        res += '\r';
+                        break;
+                    case 't':
+                        res += '\t';
+                        break;
+                    case '\r':
+                    case '\n':
+                        break;
+                    case '\\':
+                    case '(':
+                    case ')':
+                        res += c;
+                        break;
+                    default:
+                        throw new Error('Unsupported escape "' + c + '"');
+                    }
+                } else {
+                    res += c;
+                }
+            }
+            return res;
+        },
+        parse_hex_string: function() {
+            var start_pos = this.pos;
+            while (this.pos < this.buf.length) {
+                if (this.buf[this.pos] == '>'.charCodeAt(0)) {
+                    break;
+                }
+                this.pos++;
+            }
+            var hex_str = buf2str(this.buf, start_pos, this.pos);
+            this.pos++;
+            if ((hex_str.length % 2) == 1) {
+                hex_str += '0';
+            }
+            if (!/^[0-9A-Fa-f]*$/.test(hex_str)) {
+                throw new Error('Invalid hex string ' + hex_str);
+            }
+            return hex_str.replace(/([0-9A-Fa-f]{2})/g, function() {
+                return String.fromCharCode(parseInt(arguments[1], 16));
+            });
+        },
+        parse_num: function() {
+            var res = 0;
+            var first_pos = this.pos;
+            while (this.pos < this.buf.length) {
+                var by = this.buf[this.pos];
+                if ((48 <= by) && (by <= 57)) {
+                    res = res * 10 + by - 48;
+                } else {
+                    break;
+                }
+                this.pos++;
+            }
+            if (first_pos === this.pos) {
+                throw new Error('Not an ASCII number byte: ' + this.buf[this.pos]);
+            }
+            return res;
+        },
+        parse_name: function() {
+            var start_pos = this.pos;
+            var DELIM_CHARS = [0, 9, 13, 10, 32, 40, 41, 60, 62, 91, 93, 123, 125, 47, 37];
+            while (this.pos < this.buf.length) {
+                if (DELIM_CHARS.indexOf(this.buf[this.pos]) >= 0) {
+                    break;
+                }
+                this.pos++;
+            }
+            var name = buf2str(this.buf, start_pos, this.pos);
+            name = name.replace(/#([0-9a-fA-F]{2})/g, function(_, hex) {
+                return String.fromCharCode(parseInt(hex, 16));
+            });
+            return new Name(name);
+        },
+        parse_array: function() {
+            var res = [];
+            for (;;) {
+                this.skip_space();
+                if (this.buf[this.pos] == 93) { // ]
+                    break;
+                }
+                var el = this.parse();
+                res.push(el);
+            }
+            this.pos++;
+            return res;
+        },
+        parse_dict: function() {
+            var map = {};
+            while (this.pos < this.buf.length) {
+                this.skip_space();
+                if (this.skip_start('>>')) {
+                    break;
+                }
+                if (!this.skip_start('/')) {
+                    throw new Error('Key is not a name in dict');
+                }
+                var k = this.parse_name();
+                var v = this.parse();
+                map[k.name] = v;
+            }
+            var sav_pos = this.pos;
+            this.skip_space();
+            if (this.skip_start('stream\r\n') || this.skip_start('stream\n') || this.skip_start('stream')) {
+                return this.parse_stream_content(map);
+            } else {
+                this.pos = sav_pos;
+                return new Dict(map);
+            }
+        },
+        parse_stream_content: function(map) {
+            if (typeof map.Length != 'number') {
+                throw new Error('Stream Length field missing or invalid: ' + JSON.stringify(map.Length));
+            }
+            if (this.pos + map.Length > this.buf.length) {
+                throw new Error('Stream Length too large');
+            }
+            var content = this.buf.subarray(this.pos, this.pos + map.Length);
+            this.pos += map.Length;
+            this.skip_space();
+            if (!this.skip_start('endstream')) {
+                throw new Error('Missing endstream');
+            }
+            if (map.Filter) {
+                var filters = (map.Filter instanceof Array) ? map.Filter : [map.Filter];
+                var params = (map.DecodeParms instanceof Array) ? map.DecodeParms : [map.DecodeParms];
+                for (var i = 0;i < filters.length;i++) {
+                    var filter_params = params[i];
+    
+                    switch (filters[i].name) {
+                    case 'FlateDecode':
+                        content = inflate(content, filter_params ? filter_params.map : filter_params);
+                        break;
+                    default:
+                        throw new Error('Unsupported filter: ' + JSON.stringify(filters[i].name));
+                    }
+                }
+            }
+    
+            return new Stream(map, content);
+        },
+        parse: function() {
+            this.skip_space();
+            if (this.skip_start('<<')) {
+                return this.parse_dict();
+            }
+            if (this.skip_start('[')) {
+                return this.parse_array();
+            }
+            if (this.skip_start('(')) {
+                return this.parse_string();
+            }
+            if (this.skip_start('<')) {
+                return this.parse_hex_string();
+            }
+            if (this.skip_start('/')) {
+                return this.parse_name();
+            }
+            
+            if (this.skip_start('true')) {
+                return true;
+            }
+            if (this.skip_start('false')) {
+                return false;
+            }
+            if (this.skip_start('null')) {
+                return null;
+            }
+    
+            var s = buf2str(this.buf, this.pos, this.pos+32);
+            var m = /^([0-9]+)\s+([0-9]+)\s+R/.exec(s);
+            if (m) {
+                this.pos += m[0].length;
+                return new Ref(parseInt(m[1], 10), parseInt(m[2], 10));
+            }
+            m = /^[+-]?(?:[0-9]*\.[0-9]*|[0-9]+)/.exec(s);
+            if (m) {
+                this.pos += m[0].length;
+                return parseFloat(m[0]);
+            }
+    
+            throw new Error('Unable to parse ' + buf2str(this.buf, this.pos, this.pos + 40));
+        },
+        parse_xref: function() {
+            var i;
+            if (startswith(this.buf, this.pos, 'xref')) {
+                // Textual xref table;
+                this.xref_type = 'table';
+                return this.parse_xref_table();
+            }
+            this.xref_type = 'stream';
+            var obj = this.parse_object().obj;
+            var xref = [];
+    
+            if ('Prev' in obj.map) {
+                var sav_pos = this.pos;
+                this.pos = obj.map.Prev;
+                xref = this.parse_xref().xref;
+                this.pos = sav_pos;
+            }
+    
+            assert(
+                obj instanceof Stream,
+                'XRefs should be a stream, got ' + JSON.stringify(obj) + ' instead');
+            assert(
+                obj.map.Type.name === 'XRef',
+                'XRef table should be of Type XRef');
+            assert(obj.map.W.length == 3);
+            var type_length = obj.map.W[0];
+            assert(type_length <= 4);
+            var offset_length = obj.map.W[1];
+            assert((offset_length >= 1) && (offset_length <= 4));
+            var gen_length = obj.map.W[2];
+            assert((gen_length >= 1) && (gen_length <= 4));
+            assert(
+                obj.content.length % (type_length + offset_length + gen_length) === 0,
+                'content is ' + obj.content.length + ' bytes long, each entry is ' + JSON.stringify(obj.map.W));
+    
+            var total_count = obj.content.length / (type_length + offset_length + gen_length);
+            var index = obj.map.Index;
+            if (index) {
+                var aggregate_count = 0;
+                for (i = 0;i < index.length;i += 2) {
+                    assert(typeof index[i] == 'number');
+                    assert(typeof index[i + 1] == 'number');
+                    aggregate_count += index[i + 1];
+                }
+                assert(
+                    aggregate_count == total_count,
+                    'Invalid xref stream index: index says ' + aggregate_count + ' objects, but space for ' + total_count);
+            } else {
+                index = [0, total_count];
+            }
+    
+            var reader = new PDFReader(obj.content);
+            for (var index_i = 0;index_i < index.length;index_i += 2) {
+                var first_index = index[index_i];
+                var count = index[index_i + 1];
+    
+                for (i = 0;i < count;i++) {
+                    var type = 1;
+                    if (type_length) {
+                        type = reader.read_uint(type_length);
+                    }
+                    var offset = reader.read_uint(offset_length);
+                    var gen = reader.read_uint(gen_length);
+                    var xr_dict = {
+                        type: type,
+                        offset: offset,
+                        gen: gen,
+                    };
+                    if (type === 0) {
+                        xr_dict.free = true;
+                    } else {
+                        xr_dict.uncompressed = type != 2;
+                    }
+                    xref[first_index + i] = xr_dict;
+                }
+            }
+            assert(reader.at_eof());
+    
+            return {
+                meta: obj.map,
+                xref: xref,
+            };
+        },
+        parse_object: function() {
+            var s = buf2str(this.buf, this.pos, this.pos+32);
+            var m = /^([0-9]+)\s+([0-9]+)\s+obj/.exec(s);
+            if (!m) {
+                throw new Error('Missing object ID: ' + s);
+            }
+            var real_num = parseInt(m[1], 10);
+            var real_gen = parseInt(m[2], 10);
+            this.pos += m[0].length;
+            var obj = this.parse();
+            this.skip_space();
+            if (!this.skip_start('endobj')) {
+                throw new Error('endobj missing, current str: ' + JSON.stringify(buf2str(this.buf, this.pos, this.pos+32)));
+            }
+            return {
+                obj: obj,
+                num: real_num,
+                gen: real_gen,
+            };
+        },
+        parse_xref_table: function() {
+            if (!this.skip_start('xref')) {
+                throw new Error('xref table does not start with xref!');
+            }
+            this.skip_space();
+            var start_num = this.parse_num();
+            var xref = [];
+            for (var j = 0;j < start_num;j++) {
+                xref.push(undefined);
+            }
+            this.skip_space();
+            this.parse_num();  // count. Sometimes this is just a lie though, so ignore it
+            for (;;) {
+                this.skip_space();
+                if (this.skip_start('trailer')) {
+                    break;
+                }
+                var offset = this.parse_num();
+                this.skip_space();
+                var gen = this.parse_num();
+                this.skip_space();
+                var usage = this.buf[this.pos];
+                if ((usage == 102) || (usage == 110)) { // n and f
+                    this.pos++;
+                } else {
+                    // no usage character: this means we need to skip
+                    while (xref.length < offset) {
+                        xref.push(undefined);
+                    }
+                    continue;
+                }
+                xref.push({
+                    offset: offset,
+                    gen: gen,
+                    is_free: (usage === 102),
+                });
+            }
+    
+            var meta = this.parse();
+            if (meta.map.Prev) {
+                this.pos = meta.map.Prev;
+                var old = this.parse_xref_table();
+                _merge_xrefs(xref, old.xref);
+            }
+    
+            return {
+                xref: xref,
+                meta: meta.map,
+            };
+        },
+        at_eof: function() {
+            return this.pos == this.buf.length;
+        },
+    };
+    
+    function startswith(buf, pos, str) {
+        for (var i = 0;i < str.length;i++) {
+            if (str.charCodeAt(i) != buf[pos + i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    function buf2str(buf, from, to) {
+        if (from === undefined) {
+            from = 0;
+        }
+        if (to === undefined) {
+            to = buf.length;
+        }
+        var max = Math.min(to, buf.length);
+    
+        var res = '';
+        for (var i = from;i < max;i++) {
+            res += String.fromCharCode(buf[i]);
+        }
+        return res;
+    }
+    
+    
+    function check_header(buf) {
+        if (! startswith(buf, 0, '%PDF-')) {
+            throw new Error('Does not look like a PDF file!');
+        }
+    }
+    
+    function find_startxref(buf) {
+        var s = buf2str(buf, buf.length - 40,buf.length);
+        var m = /startxref\s*([0-9]+)/.exec(s);
+        if (!m) {
+            throw new Error('Cannot find startxref!');
+        }
+        return parseInt(m[1]);
+    }
+    
+    function parse_object_stream(os_obj) {
+        assert(
+            os_obj.map.Type.name === 'ObjStm',
+            'Strange Type for an object stream: ' + JSON.stringify(os_obj.map.Type.name));
+        var s = buf2str(os_obj.content, 0, os_obj.map.First);
+        var rex = /\s*([0-9]+)\s+([0-9]+)/g;
+        var res = [];
+        var r = new PDFReader(os_obj.content);
+        for (var i = 0;i < os_obj.map.N;i++) {
+            var m = rex.exec(s);
+            if (! m) {
+                throw new Error('Expected ' + os_obj.map.N + ' objects in this object stream, failed to read number ' + i);
+            }
+            var num = parseInt(m[1], 10);
+            var offset = parseInt(m[2], 10);
+            r.pos = offset + os_obj.map.First;
+            res[num] = r.parse();
+        }
+    
+        return res;
+    }
+    
+    return {
+        parse: parse,
+        PDFDocument: PDFDocument,
+        isName: isName,
+        isStream: isStream,
+        isDict: isDict,
+        isRef: isRef,
+        isNum: isNum,
+        isArray: isArray,
+        isString: isString,
+        isBool: isBool,
+        isNull: isNull,
+        newStream: newStream,
+        assert: assert,
+        buf2str: buf2str,
+        str2buf: str2buf,
+    
+        // Testing only
+        PDFReader: PDFReader,
+        Name: Name,
+        Dict: Dict,
+        Ref: Ref,
+        Stream: Stream,
+    };
+    
+    })();
+    
+    if ((typeof module != 'undefined') && (typeof require != 'undefined')) {
+        var pako = require('pako');
+        module.exports = minipdf;
+    }
+
+/////////////////////test.js///////////////////////
+// Function to fill PDF 
+var pdfBuffer;
+function fillPdf() {
+  // Fill the PDF document with data
+
+  try {
+    var fields = {};
+    var field_names = list_fields(pdfBuffer);
+    var field_values = ['Aa', '123', 'Bb'];
+
+    for (var i = 0; i < field_names.length; i++) {
+      fields[field_names[i]] = field_values[i];
+    }
+  } catch (e) {
+    console.error('Error:', e);
+  }
+
+  try {
+    filledPdfBuffer = pdfform(minipdf).transform(pdfBuffer, fields);
+  } catch (e) {
+    console.error('Error:', e);
+  }
+
+  // Download the filled PDF document
+  var blob = new Blob([filledPdfBuffer], { type: 'application/pdf' });
+  var link = document.createElement('a');
+  link.href = window.URL.createObjectURL(blob);
+  link.download = 'Filled_PDF_Document.pdf';
+  link.click();
+}
+
+function list_fields(buf) {
+  var field_names = [];
+  try {
+    var field_specs = pdfform().list_fields(buf);
+
+    for (var field_key in field_specs) {
+      field_names.push(field_key);
+    }
+    console.log('Fields:', field_names);
+    return field_names;
+  } catch (e) {
+    on_error(e);
+  }
+}
+
+// Attach click event listener to the button
+document.addEventListener('DOMContentLoaded', function() {
+  var url = './Doc1_Copy.pdf';
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.responseType = 'arraybuffer';
+
+  xhr.onload = function() {
+    if (this.status == 200) {
+      pdfBuffer = this.response;
+    } else {
+      on_error('failed to load URL (code: ' + this.status + ')');
+    }
+  };
+  xhr.send();
+
+});
+
+document.getElementById('fillPdfButton').addEventListener('click', fillPdf);
+
+/////////////////////pdfform.js////////////////
+
+'use strict';
+
+if (typeof window == 'undefined') {
+	// node.js, load compat libraries
+	var DOMParser = require('xmldom').DOMParser;
+	var XMLSerializer = require('xmldom').XMLSerializer;
+	var text_encoding = require('text-encoding');
+	var TextEncoder = text_encoding.TextEncoder;
+	var TextDecoder = text_encoding.TextDecoder;
+
+	var pako = require('pako');
+}
+
+function pdfform(minipdf_lib) {
+
+if (minipdf_lib === 'pdf.js') {
+	minipdf_lib = require('./minipdf_js.js');
+}
+
+if (! minipdf_lib) {
+	// autodetct which library to use
+	if (typeof minipdf_js != 'undefined') {
+		minipdf_lib = minipdf_js;
+	} else if (typeof minipdf != 'undefined') {
+		minipdf_lib = minipdf;
+	} else {
+		minipdf_lib = require('./minipdf.js');
+	}
+}
+
+var assert = minipdf_lib.assert;
+
+function BytesIO() {
+	this.length = 0;
+	this.entries = [];
+}
+BytesIO.prototype = {
+	write_str: function(s) {
+		this.length += s.length;
+		assert(typeof s == 'string');
+		this.entries.push(s);
+	},
+	write_buf: function(buf) {
+		this.length += buf.length;
+		assert(
+			buf instanceof Uint8Array,
+			'Expected a Uint8Array, but got ' + buf);
+		this.entries.push(buf);
+	},
+	get_uint8array: function() {
+		var res = new Uint8Array(this.length);
+		var pos = 0;
+		this.entries.forEach(function(e) {
+			if (typeof e == 'string') {
+				for (var i = 0,slen = e.length;i < slen;i++,pos++) {
+					res[pos] = e.charCodeAt(i);
+				}
+			} else {
+				res.set(e, pos);
+				pos += e.length;
+			}
+		});
+		assert(pos === this.length);
+		return res;
+	},
+	position: function() {
+		return this.length;
+	},
+};
+
+
+function pad(num, length) {
+	var ret = num + '';
+	while (ret.length < length) {
+		ret = '0' + ret;
+	}
+	return ret;
+}
+
+function serialize_str(str) {
+	var ret, i;
+
+	// simple chars, use plaintext
+	if (/^[-_/. a-zA-Z0-9]+$/.test(str)) {
+		return '(' + str + ')';
+	}
+
+	// Only ASCII and some common ANSI chars
+	if (/^[\x00-\x7FäöüÄÖÜß]*$/.test(str)) { // eslint-disable-line no-control-regex
+		ret = '(';
+		for (i = 0; i < str.length; i++) {
+			var c = str[i];
+			if (c === '\\' || c === '(' || c === ')') {
+				ret += '\\';
+			}
+			ret += c;
+		}
+		ret += ')';
+		return ret;
+	}
+
+	// Unicode
+	ret = '(';
+	ret += '\u00fe\u00ff';
+	for (i = 0; i < str.length; i++) {
+		var cu = str.charCodeAt(i);
+		var c1 = String.fromCharCode(cu >> 8);
+		if (c1 === '\\' || c1 === '(' || c1 === ')') {
+			ret += '\\';
+		}
+		ret += c1;
+		var c2 = String.fromCharCode(cu & 0xff);
+		if (c2 === '\\' || c2 === '(' || c2 === ')') {
+			ret += '\\';
+		}
+		ret += c2;
+	}
+	ret += ')';
+	return ret;
+}
+
+function serialize(node, uncompressed) {
+	var i, ret;  // Wishing for let in modern browsers :(
+	if (minipdf_lib.isRef(node)) {
+		return node.num + ' ' + node.gen + ' R';
+	} else if (minipdf_lib.isNum(node)) {
+		return node;
+	} else if (minipdf_lib.isBool(node)) {
+		return node;
+	} else if (minipdf_lib.isNull(node)) {
+		return 'null';
+	} else if (minipdf_lib.isName(node)) {
+		assert(node.name);
+		return '/' + node.name;
+	} else if (minipdf_lib.isString(node)) {
+		return serialize_str(node);
+	} else if (minipdf_lib.isArray(node)) {
+		ret = ['['];
+		for (i = 0; i < node.length; i++) {
+			ret.push(serialize(node[i], uncompressed));
+		}
+		ret.push(']');
+		return ret.join(' ');
+	} else if (minipdf_lib.isDict(node)) {
+		var map = node.map;
+		ret = ['<<'];
+		for (var key in map) {
+			ret.push('/' + key + ' ' + serialize(map[key], uncompressed));
+		}
+		ret.push('>>');
+		return ret.join('\n');
+	} else if (minipdf_lib.isStream(node)) {
+		ret = '';
+		delete node.dict.map.DecodeParms;
+		delete node.dict.map.Filter;
+
+		var content = node.getBytes();
+		assert(content, 'expecting byte content from ' + JSON.stringify(node));
+		var out;
+		if (uncompressed) {
+			out = minipdf_lib.buf2str(content);
+			node.dict.map.Length = out.length;
+		} else {
+			out = minipdf_lib.buf2str(pako.deflate(content));
+			node.dict.map.Length = out.length;
+			node.dict.map.Filter = [new minipdf_lib.Name('FlateDecode')];
+		}
+
+		assert(minipdf_lib.isDict(node.dict));
+		ret += serialize(node.dict, uncompressed);
+		ret += '\nstream\n';
+		ret += out;
+		ret += '\nendstream\n';
+		return ret;
+	} else {
+		throw new Error('Unknown node type ' + JSON.stringify(node));
+	}
+  }
+
+function PDFObjects(doc) {
+	this.entries = doc.get_xref_entries();
+	assert(minipdf_lib.isArray(this.entries), 'xref entries should be an Array');
+}
+PDFObjects.prototype = {
+add: function(obj, gen) {
+	var e = {
+		obj: obj,
+		gen: gen,
+		num: this.entries.length,
+		uncompressed: 'added',
+	};
+	this.entries.push(e);
+	return e;
+},
+update: function(ref, obj) {
+	assert(ref.num !== undefined);
+	assert(ref.gen !== undefined);
+	var e = {
+		obj: obj,
+		gen: ref.gen,
+		num: ref.num,
+		uncompressed: 'added',
+	};
+	this.entries[e.num] = e;
+	return e;
+},
+write_object: function(out, e, uncompressed) {
+	e.offset = out.position();
+	assert(e.num !== undefined);
+	var bs = serialize(e.obj, uncompressed);
+	out.write_str(e.num + ' ' + e.gen + ' obj\n');
+	out.write_str(bs);
+	out.write_str('\nendobj\n');
+},
+write_xref_stream: function(out, prev, root_ref) {
+	var map = {
+		Type: new minipdf_lib.Name('XRef'),
+		Size: this.entries.length + 1, // + 1 for this object itself
+		Root: root_ref,
+		W: [1, 4, 1],
+		Index: [],
+	};
+	if (prev !== undefined) {
+		map.Prev = prev;
+	}
+
+	var total_count = 0;
+	var need_new_index = true;
+	var bio = new BytesIO();
+	var entry = this.add('__xref_stream__', 0);
+	entry.offset = out.position();
+	this.entries.forEach(function(e, idx) {
+		var is_new_entry = e.uncompressed === 'added';
+		if (!is_new_entry) {
+			need_new_index = true;
+			return;
+		}
+
+		total_count++;
+		if (need_new_index) {
+			need_new_index = false;
+			map.Index.push(idx);
+			map.Index.push(1);
+		} else {
+			map.Index[map.Index.length - 1]++;
+		}
+
+		assert(e.offset !== undefined, 'entry should have an offset');
+		bio.write_buf(new Uint8Array([
+			(e.uncompressed ? 1 : 2),
+			(e.offset >> 24),
+			(e.offset >> 16) & 0xff,
+			(e.offset >> 8) & 0xff,
+			e.offset & 0xff,
+			e.gen,
+		]));
+	});
+	var ui8ar = bio.get_uint8array();
+
+	map.Length = 6 * (total_count + 1);
+
+	var stream = minipdf_lib.newStream(map, ui8ar);
+	entry.obj = stream;
+	this.write_object(out, entry, true);
+},
+write_xref_table: function(out, prev, root_ref) {
+	var entries = this.entries.filter(function(e) {
+		return !e.is_free;
+	});
+	var size = 1 + entries.length;
+	out.write_str('xref\n');
+	out.write_str('0 ' + size + '\n');
+	out.write_str('0000000000 65535 f\r\n');
+	entries.forEach(function(e) {
+		assert(e.offset !== undefined, 'entry should have an offset');
+		out.write_str(pad(e.offset, 10) + ' ' + pad(e.gen, 5) + ' n\r\n');
+	});
+
+	// write trailer
+	out.write_str('trailer\n');
+	var trailer = new minipdf_lib.Dict({
+		Size: size,
+		Root: root_ref,
+	});
+	out.write_str(serialize(trailer, true));
+},
+};
+
+function visit_acroform_fields(doc, callback) {
+	if (doc.acroForm) {
+		var to_visit = doc.acroForm.map.Fields.slice();
+		while (to_visit.length > 0) {
+			var n = to_visit.shift();
+			if (minipdf_lib.isRef(n)) {
+				var ref = n;
+				n = doc.fetch(n);
+				n._pdfform_ref = ref;
+			}
+
+			if (n.map && n.map.Kids && n.map.Opt && n.map.FT && (n.map.FT.name === 'Btn')) {
+				// Radio button
+				n._pdfform_spec = {
+					type: 'radio',
+					options: n.map.Opt,
+				};
+				callback(n);
+			} else if (n.map && n.map.Kids) {
+				to_visit.push.apply(to_visit, n.map.Kids);
+			} else if (n.map && n.map.Type && n.map.Type.name == 'Annot' && n.map.T) {
+				callback(n);
+			}
+		}
+	} else {
+		// No AcroForm? Look in the pages themselves
+		var pages = doc.fetch(doc.root.map.Pages);
+		pages.map.Kids.forEach(function(page_ref) {
+			var page = doc.fetch(page_ref);
+			var annots_ref = page.map.Annots;
+			var annots = doc.fetch(annots_ref);
+
+			annots.forEach(function(annot_ref) {
+				var n = doc.fetch(annot_ref);
+				n._pdfform_ref = annot_ref;
+				n._inpage_annot = true;
+				if (n.map && n.map.Type && n.map.Type.name == 'Annot' && n.map.T) {
+					callback(n);
+				}
+			});
+		});
+	}
+}
+
+function pdf_decode_str(str) {
+	if (! str.startsWith('\u00FE\u00FF')) {
+		return str;
+	}
+	var res = '';
+	for (var i = 2; i < str.length; i += 2) {
+		res += String.fromCharCode(str.charCodeAt(i) << 8 | str.charCodeAt(i + 1));
+	}
+	return res;
+}
+
+function acroform_match_spec(n, fields) {
+	var t = pdf_decode_str(n.map.T);
+	if (t in fields) {
+		return fields[t][0];
+	} else {
+		var m = /^(.*)\[([0-9]+)\]$/.exec(t);
+		if (m && (m[1] in fields)) {
+			return fields[m[1]][m[2]];
+		}
+	}
+	return undefined;
+}
+
+
+function modify_xfa(doc, objects, out, index, callback) {
+	if (!doc.acroForm) {
+		return;
+	}
+	var xfa = doc.acroForm.map.XFA;
+	if (! xfa) {
+		return; // acroForm-only
+	}
+	var section_idx = xfa.indexOf(index);
+	assert(section_idx >= 0);
+	var section_ref = xfa[section_idx + 1];
+	var section_node = doc.fetch(section_ref);
+	assert(minipdf_lib.isStream(section_node), 'XFA section node should be a stream');
+	var bs = section_node.getBytes();
+	assert(bs);
+	var prev_str = (new TextDecoder('utf-8')).decode(bs);
+
+	var str = callback(prev_str);
+ 
+	var out_bs = (new TextEncoder('utf-8').encode(str));
+	var out_node = minipdf_lib.newStream(section_node.dict.map, out_bs);
+	assert(minipdf_lib.isStream(out_node));
+
+	var e = objects.update(section_ref, out_node);
+	objects.write_object(out, e);
+}
+
+function transform(buf, fields) {
+	var doc = minipdf_lib.parse(new Uint8Array(buf));
+	assert(doc.startXRef);
+	var objects = new PDFObjects(doc);
+	var root_id = doc.get_root_id();
+	var root_ref = new minipdf_lib.Ref(root_id, 0);
+
+	var out = new BytesIO();
+	out.write_buf(new Uint8Array(buf));
+
+	// Change AcroForms
+	visit_acroform_fields(doc, function(n) {
+		var value = acroform_match_spec(n, fields);
+		if (value === undefined) {
+			return;
+		}
+
+		if (n._pdfform_spec) {
+			var type = n._pdfform_spec.type;
+			if (type === 'radio') {
+				var idx = n._pdfform_spec.options.indexOf(value);
+				if (idx === -1) return;
+
+				var kid_ref = n.map.Kids[idx];
+				if (!kid_ref) {
+					throw new Error('Cannot find kid #' + idx + ' (value=' + value + ')');
+				}
+				if (!minipdf_lib.isRef(kid_ref)) {
+					throw new Error('radio kid is not a reference');
+				}
+
+				var kid = doc.fetch(kid_ref);
+				kid.map.AS = kid.map.V = kid.map.DV = new minipdf_lib.Name('Yes');
+
+				var kid_entry = objects.update(kid_ref, kid);
+				objects.write_object(out, kid_entry);
+				return;
+			} else {
+				throw new Error('Unsupported spec type ' + type);
+			}
+		} else {
+			var ft_name = n.map.FT.name;
+			if (ft_name == 'Tx') {
+				n.map.V = '' + value;
+			} else if (ft_name == 'Btn') {
+				n.map.AS = n.map.V = n.map.DV = value ? new minipdf_lib.Name('Yes') : new minipdf_lib.Name('Off');
+			} else if (ft_name == 'Ch') {
+				n.map.V =  '' + value;
+			} else if (ft_name == 'Sig') {
+				return; // Signature fields are not supported so far
+			} else {
+				throw new Error('Unsupported input type ' + n.map.FT.name);
+			}
+		}
+
+		var ref = n._pdfform_ref;
+		var e = objects.update(ref, n);
+		objects.write_object(out, e);
+	});
+
+	var acroform_ref = doc.get_acroform_ref();
+	if (acroform_ref) { // Acroform present
+		doc.acroForm.map.NeedAppearances = true;
+		if (minipdf_lib.isRef(acroform_ref)) {
+			// Replace just the AcroForm object
+			var e = objects.update(acroform_ref, doc.acroForm);
+			objects.write_object(out, e);
+		} else {
+			// Replace the entire root object
+			doc.root.map.AcroForm = doc.acroForm;
+			var root = objects.update(root_ref, doc.root);
+			objects.write_object(out, root);
+		}
+	}
+
+	// Change XFA
+	modify_xfa(doc, objects, out, 'datasets', function(str) {
+		// Fix up XML
+		str = str.replace(/\n(\/?>)/g, '$1\n');
+
+		var ds_doc = new DOMParser().parseFromString(str, 'application/xml');
+		for (var f in fields) {
+			var els = ds_doc.getElementsByTagName(f);
+
+			for (var i = 0;i < els.length;i++) {
+				var val = fields[f][i];
+				if (val === undefined) {
+					continue;
+				}
+				var el = els[i];
+				while (el.firstChild) {
+					el.removeChild(el.firstChild);
+				}
+
+				if (typeof val == 'boolean') {
+					val = val ? 1 : 0;
+				}
+				el.appendChild(ds_doc.createTextNode(val));
+			}
+		}
+		str = new XMLSerializer().serializeToString(ds_doc);
+		return str;
+	});
+
+	var startxref = out.position();
+	if (doc.xref_type === 'table') {
+		objects.write_xref_table(out, doc.startXRef, root_ref);
+	} else {
+		objects.write_xref_stream(out, doc.startXRef, root_ref);
+	}
+
+	out.write_str('\nstartxref\n');
+	out.write_str(startxref + '\n');
+	out.write_str('%%EOF');
+
+	return out.get_uint8array();
+}
+
+function list_fields(data) {
+	var doc = minipdf_lib.parse(new Uint8Array(data));
+	var res = {};
+
+	visit_acroform_fields(doc, function(n) {
+		var raw_name = pdf_decode_str(n.map.T);
+		var name = raw_name;
+		var index = 0;
+		var m = /^(.+?)\[([0-9]+)\]$/.exec(raw_name);
+		if (m) {
+			name = m[1];
+			index = parseInt(m[2], 10);
+		}
+
+		var spec;
+		if (n._pdfform_spec) {
+			spec = n._pdfform_spec;
+		} else {
+			var ft_name = n.map.FT.name;
+			if (ft_name === 'Tx') {
+				spec = {type: 'string'};
+			} else if (ft_name === 'Btn') {
+				spec = {type: 'boolean'};
+			} else if (ft_name === 'Ch') {
+				spec = {
+					type: 'select',
+					options: n.map.Opt.slice(),
+				};
+			} else if (ft_name === 'Sig') {
+				return; // Signature names are not supported so far
+			} else {
+				throw new Error('Unsupported input type' + ft_name);
+			}
+		}
+
+		if (!res[name]) {
+			res[name] = [];
+		}
+		res[name][index] = spec;
+	});
+
+	return res;
+}
+
+return {
+	transform: transform,
+	list_fields: list_fields,
+	// test only
+	_serialize_str: serialize_str,
+	_decode_str: pdf_decode_str,
+};
+}
+
+// Backwards compatibility only
+pdfform.transform = function(buf, fields) {return pdfform().transform(buf, fields);};
+
+if (typeof module != 'undefined') {
+	module.exports = pdfform;
+}
+
+///////////////////////test.html/////////////////////
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>Fill PDF Document</title>
+</head>
+<body>
+<button id="fillPdfButton">Fill PDF</button>
+
+<script src="test.js"></script>
+  <!-- pako and pdfform.js are required  -->
+  <script src="./minipdf.js"></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.3/pako.min.js"
+    integrity="sha256-X7u/eQo6oIgWqc5jOmTjQn3loM8Lse0ock76Gkkn/Ro=" crossorigin="anonymous"></script>
+  <script src="./pdfform.js"></script>
+</body>
+</html>
+
