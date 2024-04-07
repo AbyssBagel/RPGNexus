@@ -141,3 +141,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    var numberInputs = document.querySelectorAll('#characteristics input[type="number"]');
+    numberInputs.forEach(function(numberchanged) {
+        numberchanged.addEventListener('change', function() {
+            CalculatePointBasedAbilityScore();
+        });
+    });
+});
+
+
+
+function CalculatePointBasedAbilityScore() {
+    var pointsleft=27;
+    var characteristicsDiv = document.getElementById('characteristics');
+    var numberInputs = characteristicsDiv.querySelectorAll('input[type="number"]');
+    var numbers = Array.from(numberInputs).map(function(input) {
+        return parseInt(input.value);
+    });
+    numbers.forEach(function(number) {
+        var pointsTable = {
+            8: 0,
+            9: 1,
+            10: 2,
+            11: 3,
+            12: 4,
+            13: 5,
+            14: 7,
+            15: 9
+        };
+        pointsleft-=pointsTable[number];
+        if(pointsleft<0){
+            document.getElementById("Characstext").innerHTML = "Characteristics - Points left : " + pointsleft + " You have used more points than allowed, please correct it !";
+        }else{
+        console.log("Points Left:", pointsleft);
+        document.getElementById("Characstext").innerHTML = "Characteristics - Points left : " + pointsleft;}
+    });
+}
