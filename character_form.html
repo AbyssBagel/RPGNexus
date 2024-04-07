@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+    <link href="style.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: 'Didact Gothic', sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <header id="header" class="header">
+        <div class="header-top">
+            <div class="container">
+                <div class="up-row">
+                    <div class="up-row-collapse">
+                        <ul class="logo" style="padding-left: 20px;"> 
+                            <a href="home.html">
+                                <img src="images/icon.png" width=400px/>
+                            </a>
+                        </ul>
+                        <ul class="login order-1" style="padding-left: 0px;padding-right: 50px;">
+                            <!--{% if user.is_authenticated %}
+                                <a href="404.html">{{ user.id }}</a>
+                            {% else %}-->
+                                <li class="dropdown">
+                                    <button onclick="loginMenu()" class="dropbtn">Login</button>
+                                    <div id="loginMenu" class="login-content">
+                                        <a href="login.html">Login</a>
+                                        <a href="404.html">Register</a>
+                                </li>
+                            <!--{% endif %}-->
+                        </ul>
+                    </div>
+                </div>
+            </div>      
+        </div>
+        <div class="header-bottom">
+            <div class="container">
+                <div class="navbar">
+                    <div class="dropdown2">
+                        <button class="dropbtn2">Dungeon & Dragons
+                            <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="404.html">Introduction + Our Thoughts</a>
+                            <a href="https://dnd.wizards.com" target="_blank">Official website</a>
+                        </div>
+                    </div>
+                    <div class="dropdown2">
+                        <button class="dropbtn2">Pathfinder
+                            <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="404.html">Introduction + Our Thoughts</a>
+                            <a href="https://www.youtube.com/watch?v=sP1HIWyv8DI" target="_blank">Fast Start & Introduction</a>
+                        </div>
+                    </div>
+                    <div class="dropdown2">
+                        <button class="dropbtn2">Lord of the Rings : Adventure in Middle Earth
+                            <i class="fa fa-caret-down"></i>
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="404.html">Introduction + Our Thoughts</a>
+                            <a href="https://www.youtube.com/watch?v=uddCmjd3R4M" target="_blank">Why should you play Adventures in Middle Earth?</a>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+        </div>
+    </header>
+
+    <section id="intro" class="intro position-relative">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-5">
+                    <div class="intro-title">
+                        <h1 class="d-block">
+                            <span class="d-block">Let's create your new character !</span>
+                            <span class="d-block">Follow the form and fill in the different boxes</span>
+                            <span class="d-block">Pick your Class first and then your Background then pick your skill proficiencies, not the other way around</span>
+                        </h1>
+                    </div>
+                    <form action="/CharSubmit" method="POST">
+                        <div class="form-group">
+                            <label for="pname">Player Name:</label>
+                            <input type="text" id="pname" name="playername" class="form-control">
+                            <label for="cname">Character Name:</label>
+                            <input type="text" id="cname" name="charactername" class="form-control">
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="sex">Sex:</label>
+                            <input type="text" id="sex" name="sex" class="form-control">
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="race">Race:</label>
+                            <select id="race" name="race" class="form-control">
+                                <option value="Human">Human</option>
+                                <option value="Elf">Elf</option>
+                                <option value="Dwarf">Dwarf</option>
+                            </select>
+                            <label for="class">Class:</label>
+                            <select id="class" name="class" class="form-control">
+                                <option value="Fighter">Fighter</option>
+                                <option value="Wizard">Wizard</option>
+                                <option value="Paladin">Paladin</option>
+                                <option value="Rogue">Rogue</option>
+                            </select>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <label for="alignment">Alignment:</label>
+                            <select id="alignment" name="alignment" class="form-control">
+                                <option value="LG">Lawful Good</option>
+                                <option value="LN">Lawful Neutral</option>
+                                <option value="LE">Lawful Evil</option>
+                                <option value="NG">Neutral Good</option>
+                                <option value="TN">True Neutral</option>
+                                <option value="NE">Neutral Evil</option>
+                                <option value="CG">Chaotic Good</option>
+                                <option value="CN">Chaotic Neutral</option>
+                                <option value="CE">Chaotic Evil</option>
+                            </select>
+                            <label for="background">Background:</label>
+                            <select id="background" name="background" class="form-control">
+                                <option value="Acolyte">Acolyte</option>
+                                <option value="Charlatan">Charlatan</option>
+                                <option value="Criminal">Criminal</option>
+                                <option value="Entertainer">Entertainer</option>
+                                <option value="Folk Hero">Folk Hero</option>
+                                <option value="Guild Artisan">Guild Artisan</option>
+                                <option value="Noble">Noble</option>
+                                <option value="Outlander">Outlander</option>
+                                <option value="Sage">Sage</option>
+                                <option value="Soldier">Soldier</option>
+                                <option value="Urchin">Urchin</option>
+                                <option value="Hermit">Hermit</option>
+                            </select>
+                        </div>
+                        <div id="GivenSkillProfByBg"></div>
+                        <div id="SkillProf">Skill proficiency : Check all skills you have proficiency with !</div>
+                        <div id="checkbox-proficiencies">
+                        <input type="checkbox" id="athletics" name="proficiencies" value="athletics">
+                        <label for="athletics">Athletics</label>
+                        <input type="checkbox" id="acrobatics" name="proficiencies" value="acrobatics">
+                        <label for="acrobatics">Acrobatics</label>
+                        <input type="checkbox" id="sleight of hand" name="proficiencies" value="sleight of hand">
+                        <label for="sleight of hand">Sleight of Hand</label>
+                        <input type="checkbox" id="stealth" name="proficiencies" value="stealth">
+                        <label for="stealth">Stealth</label>
+                        <input type="checkbox" id="arcana" name="proficiencies" value="arcana">
+                        <label for="arcana">Arcana</label>
+                        <input type="checkbox" id="history" name="proficiencies" value="history">
+                        <label for="history">History</label>
+                        <input type="checkbox" id="investigation" name="proficiencies" value="investigation">
+                        <label for="investigation">Investigation</label>
+                        <input type="checkbox" id="nature" name="proficiencies" value="nature">
+                        <label for="nature">Nature</label>
+                        <input type="checkbox" id="religion" name="proficiencies" value="religion">
+                        <label for="religion">Religion</label>
+                        <input type="checkbox" id="animal handling" name="proficiencies" value="animal handling">
+                        <label for="animal handling">Animal Handling</label>
+                        <input type="checkbox" id="insight" name="proficiencies" value="insight">
+                        <label for="insight">Insight</label>
+                        <input type="checkbox" id="medicine" name="proficiencies" value="medicine">
+                        <label for="medicine">Medicine</label>
+                        <input type="checkbox" id="perception" name="proficiencies" value="perception">
+                        <label for="perception">Perception</label>
+                        <input type="checkbox" id="survival" name="proficiencies" value="survival">
+                        <label for="survival">Survival</label>
+                        <input type="checkbox" id="deception" name="proficiencies" value="deception">
+                        <label for="deception">Deception</label>
+                        <input type="checkbox" id="intimidation" name="proficiencies" value="intimidation">
+                        <label for="intimidation">Intimidation</label>
+                        <input type="checkbox" id="performance" name="proficiencies" value="performance">
+                        <label for="performance">Performance</label>
+                        <input type="checkbox" id="persuasion" name="proficiencies" value="persuasion">
+                        <label for="persuasion">Persuasion</label>
+                    </div>
+                    <label for="flaw">Flaw:</label>
+                    <input type="text" id="flaw" name="flaw" class="form-control">
+                    <br>
+                    <label for="trait">Personality Trait:</label>
+                    <input type="text" id="trait" name="trait" class="form-control">
+                    <br>
+                    <label for="ideal">Ideal:</label>
+                    <input type="text" id="ideal" name="ideal" class="form-control">
+                    <br>
+                    <label for="bond">Bond:</label>
+                    <input type="text" id="bond" name="bond" class="form-control">
+                        <p>Standard Languages</p>
+                        <input type="checkbox" id="common" name="languages" value="common">
+                        <label for="common">Common</label><br>
+                        <input type="checkbox" id="dwarvish" name="languages" value="dwarvish">
+                        <label for="dwarvish">Dwarvish</label><br>
+                        <input type="checkbox" id="elvish" name="languages" value="elvish">
+                        <label for="elvish">Elvish</label><br>
+                        <input type="checkbox" id="giant" name="languages" value="giant">
+                        <label for="giant">Giant</label><br>
+                        <input type="checkbox" id="gnomish" name="languages" value="gnomish">
+                        <label for="gnomish">Gnomish</label><br>
+                        <input type="checkbox" id="halfling" name="languages" value="halfling">
+                        <label for="halfling">Halfling</label><br>
+                        <input type="checkbox" id="orc" name="languages" value="orc">
+                        <label for="orc">Orc</label><br>
+                        <p>Exotic Languages</p>
+                        <input type="checkbox" id="abyssal" name="languages" value="abyssal">
+                        <label for="abyssal">Abyssal</label><br>
+                        <input type="checkbox" id="celestial" name="languages" value="celestial">
+                        <label for="celestial">Celestial</label><br>
+                        <input type="checkbox" id="draconic" name="languages" value="draconic">
+                        <label for="draconic">Draconic</label><br>
+                        <input type="checkbox" id="deep speech" name="languages" value="deep speech">
+                        <label for="deep speech">Deep Speech</label><br>
+                        <input type="checkbox" id="infernal" name="languages" value="infernal">
+                        <label for="infernal">Infernal</label><br>
+                        <input type="checkbox" id="primordial" name="languages" value="primordial">
+                        <label for="primordial">Primordial</label><br>
+                        <input type="checkbox" id="sylvan" name="languages" value="sylvan">
+                        <label for="sylvan">Sylvan</label><br>
+                        <input type="checkbox" id="undercommon" name="languages" value="undercommon">
+                        <label for="undercommon">Undercommon</label><br>
+                        <div class="form-group">
+                            <label for="equipment">Equipment:</label>
+                            <textarea id="equipment" name="equipment" class="form-control"></textarea>
+                        </div>
+                        <div id="AppearanceArea">
+                        <div class="form-group">
+                            <label for="age">Age:</label>
+                            <input type="number" id="age" name="age" class="form-control">
+                            <label for="eyes">Eyes:</label>
+                            <input type="text" id="eyes" name="eyes" class="form-control">
+                            <label for="hair">Hair:</label>
+                            <input type="text" id="hair" name="hair" class="form-control">
+                            <label for="skin">Skin:</label>
+                            <input type="text" id="skin" name="skin" class="form-control">
+                            <label for="weight">Weight:</label>
+                            <input type="text" id="weight" name="weight" class="form-control">
+                            <label for="height">Height:</label>
+                            <input type="text" id="height" name="height" class="form-control">
+                            <label for="appearance">Appearance Description:</label>
+                            <textarea id="appearance" name="appearance" class="form-control"></textarea>
+                        </div>
+                        <button type="submit">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="footer" class="footer">
+        <div class="footer_copyright py-3">
+            <div class="container">
+                <div class="row">
+                    <hr class="col-2 text-center order-1">
+                    <div class="col-12 text-center order-0">
+                        <a href="aboutus.html">About us</a>
+                         | 
+                        <a href="contactus.html">Contact us</a>
+                    </div>
+                    <div class="col-12 text-center order-2">
+                        <span class="d-block">
+                            <a href="GCU.html">General Conditions of Use (GCU)</a>
+                        </span>
+                        <span class="d-block">@ 2024 Lorem Ipsum. All rights reserved</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="cform.js"></script>
+</body>
+</html>
+
