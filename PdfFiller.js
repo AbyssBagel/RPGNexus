@@ -8,6 +8,7 @@ function fillPdf() {
     var field_names = list_fields(pdfBuffer);
     var def1 = '';
     var def2 = false;
+    data=getData();
     var field_values = [
       [CHAmod], 
       [Acrobaties], 
@@ -33,8 +34,8 @@ function fillPdf() {
       [CONmod] ,
       [DEXmod] ,
       [STRmod] ,
-      [Inspiration] ,
-      [Maitrise] ,
+      [def2] ,
+      ['+2'] ,
       [STRsave] ,
       [DEXsave] ,
       [CONsave] ,
@@ -42,17 +43,17 @@ function fillPdf() {
       [WISsave] ,
       [CHAsave] ,
       [CA] ,
-      [Initiative] ,
+      [DEXmod] ,
       [Vitesse],
       [MaxHP] ,
       [HPActuel] ,
-      [HPTmp] ,
-      [Nom] ,
-      [ClasseNiveau] ,
-      [Historique] ,
-      [NomJoueur] ,
-      [Alignement] ,
-      [Race] ,
+      ['0'] ,
+      [data.charactername] ,
+      [data.Class] ,
+      [data.Background] ,
+      [data.playername] ,
+      [data.Alignment] ,
+      [data.race] ,
       [EXP] ,
       [STR] ,
       [DEX] ,
@@ -60,15 +61,15 @@ function fillPdf() {
       [INT] ,
       [WIS] ,
       [CHA] ,
-      [Personnalite], 
-      [Ideaux] ,
-      [Liens] ,
-      [Defauts] ,
+      [data.trait], 
+      [data.ideal] ,
+      [data.bond] ,
+      [data.flaw] ,
       [TotalDeVie] ,
-      [DeVieActuel] ,
-      [JetMortEchec1] ,
-      [JetMortEchec2] ,
-      [JetMortEchec3] ,
+      [TotalDeVie] ,
+      [def2] ,
+      [def2] ,
+      [def2] ,
       [Weapon1] ,
       [Weapon2] ,
       [Weapon3] ,
@@ -80,51 +81,51 @@ function fillPdf() {
       [WeaponBonus3] ,
       [Incantations] ,
       [Capacite] ,
-      [PerceptionPassive] ,
+      [WIS] ,
       [STRMaitrise] ,
       [DEXMaitrise] ,
       [CONMaitrise] ,
       [INTMaitrise] ,
       [WISMaitrise] ,
       [CHAMaitrise] ,
-      [AcrobatieMaitrise] ,
-      [ArcaneMaitrise] ,
-      [AthletismeMaitrise] ,
-      [DiscretionMaitrise] ,
-      [DressageMaitrise] ,
-      [EscamotageMaitrise] ,
-      [HistoireMaitrise] ,
-      [IntimidationMaitrise] ,
-      [IntuitionMaitrise] ,
-      [InvestigationMaitrise] ,
-      [MedecineMaitrise] ,
-      [NatureMaitrise] ,
-      [PerceptionMaitrise] ,
-      [PersuasionMaitrise] ,
-      [ReligionMaitrise] ,
-      [RepresentationMaitrise] ,
-      [SurvieMaitrise] ,
-      [TromperieMaitrise] ,
+      [data.proficiencies.includes('acrobatics') ? true : false] ,
+      [data.proficiencies.includes('arcane') ? true : false] ,
+      [data.proficiencies.includes('athletics') ? true : false] ,
+      [data.proficiencies.includes('stealth') ? true : false] ,
+      [data.proficiencies.includes('animalhandling') ? true : false] ,
+      [data.proficiencies.includes('sleightofhand') ? true : false] ,
+      [data.proficiencies.includes('history') ? true : false] ,
+      [data.proficiencies.includes('intimidation') ? true : false] ,
+      [data.proficiencies.includes('insight') ? true : false] ,
+      [data.proficiencies.includes('investigation') ? true : false] ,
+      [data.proficiencies.includes('medecine') ? true : false] ,
+      [data.proficiencies.includes('nature') ? true : false] ,
+      [data.proficiencies.includes('perception') ? true : false] ,
+      [data.proficiencies.includes('persuasion') ? true : false] ,
+      [data.proficiencies.includes('religion') ? true : false] ,
+      [data.proficiencies.includes('performance') ? true : false] ,
+      [data.proficiencies.includes('survival') ? true : false] ,
+      [data.proficiencies.includes('deception') ? true : false] ,
       [Copper] ,
       [Silver] ,
       [Electrum],
       [Gold] ,
       [Platinum] ,
-      [Equipement] ,
-      [MaitrisesLangues] ,
-      [Nom2] ,
-      [Age] ,
-      [Taille] ,
-      [Poids] ,
-      [Yeux] ,
-      [Peau] ,
-      [Cheveux] ,
-      [Apparence] ,
-      [Allies] ,
-      [NomAllies] ,
-      [Background] ,
-      [FeatTraits] ,
-      [Tresor] ,
+      [data.equipment] ,
+      data.languages ,  //already an array in json
+      [data.charactername] ,
+      [data.age] ,
+      [data.height] ,
+      [data.weight] ,
+      [data.eyes] ,
+      [data.skin] ,
+      [data.hair] ,
+      [data.appearance] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
       [ClasseIncantation] ,
       [SortsAPreparer] ,
       [SpellSaveDC] ,
@@ -138,7 +139,7 @@ function fillPdf() {
       [Cantrips7] ,
       [Cantrips8] ,
       [SpellSlotLvl1] ,
-      [SpellSlotLvl1Used] ,
+      ['0'] ,
       [def2],
       [def2] ,
       [def2] ,
@@ -377,7 +378,7 @@ function list_fields(buf) {
   }
 }
 
-// Attach click event listener to the button
+
 document.addEventListener('DOMContentLoaded', function() {
   var url = './FeuillePersoDD5.pdf';
 
@@ -395,5 +396,27 @@ document.addEventListener('DOMContentLoaded', function() {
   xhr.send();
 
 });
+
+// Fetch the JSON file
+function getData(){
+fetch('form_data_1712457923054.json')
+  .then(response => {
+    // Check if response is successful
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    // Parse JSON
+    return response.json();
+  })
+  .then(data => {
+    // Data is now parsed JSON object
+    return data;
+    // You can access the data properties here
+  })
+  .catch(error => {
+    console.error('There was a problem with the fetch operation:', error);
+  });
+}
+
 
 document.getElementById('fillPdfButton').addEventListener('click', fillPdf);

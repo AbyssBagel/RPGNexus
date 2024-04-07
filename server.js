@@ -11,7 +11,7 @@ app.use(express.static(__dirname));
 // Route for the homepage
 app.get('/', (req, res) => {
   console.log("Directed to Home Page")
-  res.sendFile(__dirname + '/PdfFiller.html');
+  res.sendFile(__dirname + '/home.html');
 });
 
 // Route for redirection
@@ -23,8 +23,6 @@ app.get('/login', (req, res) => {
   console.log("Directed to login page")
   res.sendFile('login.html', { root: __dirname });
 });
-
-
 
 app.post('/CharSubmit', (req, res) => {
   console.log("Form submitted successfully!")
