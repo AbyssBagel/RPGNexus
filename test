@@ -1,0 +1,15 @@
+<form>
+    <p>Select your favorite programming languages:</p>
+    <input type="checkbox" id="java" name="languages" value="java">
+    <label for="java">Java</label><br>
+    <input type="checkbox" id="python" name="languages" value="python">
+    <label for="python">Python</label><br>
+    <input type="checkbox" id="javascript" name="languages" value="javascript">
+    <label for="javascript">JavaScript</label><br>
+    <input type="checkbox" id="csharp" name="languages" value="csharp">
+    <label for="csharp">C#</label><br>
+    <input type="checkbox" id="ruby" name="languages" value="ruby">
+    <label for="ruby">Ruby</label><br>
+    <br>
+    <input type="submit" value="Submit">
+</form>
