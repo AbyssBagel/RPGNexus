@@ -3,6 +3,9 @@ const fs = require('fs');
 const path = require('path');
 const app = express();
 console.log("Server is starting...")
+const hitdicearray = ["barbarian"=12,"bard"=8,"cleric"=8,"druid"=8,"fighter"=10,"monk"=8,"paladin"=10,"ranger"=10,"rogue"=8,"sorcerer"=6,"warlock"=8,"wizard"=6];
+const racespeedarray = ["dwarf"=25,"elf"=30,"human"=30];
+const racetraits = ["dwarf"="Traits :\ndarkvision\ndwarven resilience\ndwarven combat training\nstonecunning\ndwarven toughness\n","elf"="Traits :\ndarkvision\nkeen senses\nfey ancestry\ntrance\n","human"="Traits : none\n"];
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -36,8 +39,10 @@ app.post('/CharSubmit', (req, res) => {
 
 function storeFormData(data) {
   // Convert data to JSON string
-  const jsonData = JSON.stringify(data);
+  var jsonData = JSON.stringify(data);
   const directory = path.join(__dirname, 'FormData');
+  jsonData = AddInfoToJson(jsonData);
+  
 
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory);
@@ -56,6 +61,55 @@ function storeFormData(data) {
   });
 }
 
+
+function AddInfoToJson(jsondata){
+  switch(jsondata['class']){
+    case "Barbarian":
+      jsondata['profsaves']=['strength','constitution']
+    case "Bard":
+      jsondata['profsaves']=['dexterity','charisma']
+    case "Cleric":
+      jsondata['profsaves']=['wisdom','charisma']
+    case "Druid":
+      jsondata['profsaves']=['intelligence','wisdom']
+    case "Fighter":
+      jsondata['profsaves']=['strength','constitution']
+    case "Monk":
+      jsondata['profsaves']=['dexterity','wisdom']
+    case "Paladin":
+      jsondata['profsaves']=['wisdom','charisma']
+    case "Ranger":
+      jsondata['profsaves']=['dexterity','wisdom']
+    case "Rogue":
+      jsondata['profsaves']=['dexterity','intelligence']
+    case "Sorcerer":
+      jsondata['profsaves']=['constitution','charisma']
+    case "Warlock":
+      jsondata['profsaves']=['wisdom','charisma']
+    case "Wizard":
+      jsondata['profsaves']=['intelligence','wisdom']
+  }
+  jsonData['profbonus'] = Math.floor(jsonData['level']/4)+2
+  jsonData['strmod'] = Math.floor((jsonData['strength']-10)/2);
+  jsonData['dexmod'] = Math.floor((jsonData['dexterity']-10)/2);
+  jsonData['conmod'] = Math.floor((jsonData['constitution']-10)/2);
+  jsonData['intmod'] = Math.floor((jsonData['intelligence']-10)/2);
+  jsonData['wismod'] = Math.floor((jsonData['wisdom']-10)/2);
+  jsonData['chamod'] = Math.floor((jsonData['charisma']-10)/2);
+  jsonData['hitdice'] = hitdicearray[jsonData['class']];
+  jsonData['hp'] = jsonData['hitdice'] + jsonData['conmod'];
+  jsonData['ac'] = 10 + jsonData['dexmod'];
+  jsonData['initiative'] = jsonData['dexmod'];
+  jsonData['speed'] = racespeedarray[jsonData['race']];
+
+  //Rendu ici, faut concaténer les traits raciaux avec les skills de la classe
+  //jsonData['skillstraits'] 
+
+
+
+
+  return jsondata
+}
 
 // Start the server
 const port = 3000;
