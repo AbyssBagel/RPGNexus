@@ -11,24 +11,24 @@ function fillPdf() {
     data=getData();
     var field_values = [
       [data.modcha], 
-      [Acrobaties], 
-      [Arcanes],
-      [Athlétisme], 
-      [Discrétion], 
-      [Dressage], 
-      [Escamotage], 
-      [Histoire], 
-      [Intuition], 
-      [Investigation], 
-      [Médecine], 
-      [Nature], 
-      [Perception], 
-      [Représentation] 
-      [Survie], 
-      [Tromperie], 
-      [Intimidation] ,
-      [Persuasion] ,
-      [Religion] ,
+      [data.proficiencies.includes('acrobatics') ? data.moddex + data.prof : data.moddex], 
+      [data.proficiencies.includes('arcane') ? data.modint + data.prof : data.modint],
+      [data.proficiencies.includes('athletics') ? data.modstr + data.prof : data.modstr], 
+      [data.proficiencies.includes('stealth') ? data.moddex + data.prof : data.moddex], 
+      [data.proficiencies.includes('animalhandling') ? data.modwis + data.prof : data.modwis], 
+      [data.proficiencies.includes('sleightofhand') ? data.moddex + data.prof : data.moddex], 
+      [data.proficiencies.includes('history') ? data.modint + data.prof : data.modint], 
+      [data.proficiencies.includes('insight') ? data.modwis + data.prof : data.modwis], 
+      [data.proficiencies.includes('investigation') ? data.modint + data.prof : data.modint], 
+      [data.proficiencies.includes('medecine') ? data.modwis + data.prof : data.modwis], 
+      [data.proficiencies.includes('nature') ? data.modint + data.prof : data.modint], 
+      [data.proficiencies.includes('perception') ? data.modwis + data.prof : data.modwis], 
+      [data.proficiencies.includes('performance') ? data.modcha + data.prof : data.modcha] 
+      [data.proficiencies.includes('survival') ? data.modwis + data.prof : data.modwis], 
+      [data.proficiencies.includes('deception') ? data.modcha + data.prof : data.modcha], 
+      [data.proficiencies.includes('intimidation') ? data.modcha + data.prof : data.modcha] ,
+      [data.proficiencies.includes('persuasion') ? data.modcha + data.prof : data.modcha] ,
+      [data.proficiencies.includes('religion') ? data.modint + data.prof : data.modint] ,
       [data.modwis] ,
       [data.modint] ,
       [data.modcon] ,
@@ -36,12 +36,12 @@ function fillPdf() {
       [data.modstr] ,
       [def2] ,
       ['+2'] ,
-      [data.profsaves.includes('strenght') ? true : false] ,
-      [data.profsaves.includes('dexterity') ? true : false] ,
-      [data.profsaves.includes('constitution') ? true : false] , //A changer ca
-      [data.profsaves.includes('intelligence') ? true : false] ,
-      [data.profsaves.includes('wisdom') ? true : false] ,
-      [data.profsaves.includes('charisma') ? true : false] ,
+      [data.profsaves.includes('strenght') ? data.modstr + data.prof : data.modstr] ,
+      [data.profsaves.includes('dexterity') ? data.moddex + data.prof : data.moddex] ,
+      [data.profsaves.includes('constitution') ? data.modcon + data.prof : data.modcon] , //data.prof ?
+      [data.profsaves.includes('intelligence') ? data.modint + data.prof : data.modint] ,
+      [data.profsaves.includes('wisdom') ? data.modwis + data.prof : data.modwis] ,
+      [data.profsaves.includes('charisma') ? data.modcha + data.prof : data.modcha] ,
       [data.ac] ,
       [data.moddex] ,
       [data.speed],
@@ -80,7 +80,7 @@ function fillPdf() {
       [def1] ,
       [def1] ,
       [def1] ,
-      [Capacite] ,
+      [''] , //here Capacite
       [data.wisdom] ,
       [data.profsaves.includes('strenght') ? true : false] ,
       [data.profsaves.includes('dexterity') ? true : false] ,
@@ -126,19 +126,19 @@ function fillPdf() {
       [def1] ,
       [def1] ,
       [def1] ,
-      [ClasseIncantation] ,
-      [SortsAPreparer] ,
-      [SpellSaveDC] ,
-      [SpellAtkBonus] ,
-      [Cantrips1] ,
-      [Cantrips2] ,
-      [Cantrips3] ,
-      [Cantrips4] ,
-      [Cantrips5] ,
-      [Cantrips6] ,
-      [Cantrips7] ,
-      [Cantrips8] ,
-      [SpellSlotLvl1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
       ['0'] ,
       [def2],
       [def2] ,
@@ -185,18 +185,18 @@ function fillPdf() {
       [def2] ,
       [def2] ,
       [def2] ,
-      [SpellLvl1_1] ,
-      [SpellLvl1_2] ,
-      [SpellLvl1_3] ,
-      [SpellLvl1_4] ,
-      [SpellLvl1_5] ,
-      [SpellLvl1_6] ,
-      [SpellLvl1_7] ,
-      [SpellLvl1_8] ,
-      [SpellLvl1_9] ,
-      [SpellLvl1_10] ,
-      [SpellLvl1_11] ,
-      [SpellLvl1_12] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
+      [def1] ,
       [def1] ,
       [def1] ,
       [def2],
@@ -342,14 +342,13 @@ function fillPdf() {
       ];
 
     for (var i = 0; i < field_names.length; i++) {
-      console.log(field_names[i]);
-      //fields[field_names[i]] = field_values[i];
+      fields[field_names[i]] = field_values[i];
     }
   } catch (e) {
     console.error('Error:', e);
   }
 
-  /*try {
+  try {
     filledPdfBuffer = pdfform(minipdf).transform(pdfBuffer, fields);
   } catch (e) {
     console.error('Error:', e);
@@ -360,7 +359,7 @@ function fillPdf() {
   var link = document.createElement('a');
   link.href = window.URL.createObjectURL(blob);
   link.download = 'Filled_PDF_Document.pdf';
-  link.click();*/
+  link.click();
 }
 
 function list_fields(buf) {
