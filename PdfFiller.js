@@ -11,24 +11,24 @@ function fillPdf() {
     data=getData();
     var field_values = [
       [data.modcha], 
-      [data.proficiencies.includes('acrobatics') ? data.moddex + data.prof : data.moddex], 
-      [data.proficiencies.includes('arcane') ? data.modint + data.prof : data.modint],
-      [data.proficiencies.includes('athletics') ? data.modstr + data.prof : data.modstr], 
-      [data.proficiencies.includes('stealth') ? data.moddex + data.prof : data.moddex], 
-      [data.proficiencies.includes('animalhandling') ? data.modwis + data.prof : data.modwis], 
-      [data.proficiencies.includes('sleightofhand') ? data.moddex + data.prof : data.moddex], 
-      [data.proficiencies.includes('history') ? data.modint + data.prof : data.modint], 
-      [data.proficiencies.includes('insight') ? data.modwis + data.prof : data.modwis], 
-      [data.proficiencies.includes('investigation') ? data.modint + data.prof : data.modint], 
-      [data.proficiencies.includes('medecine') ? data.modwis + data.prof : data.modwis], 
-      [data.proficiencies.includes('nature') ? data.modint + data.prof : data.modint], 
-      [data.proficiencies.includes('perception') ? data.modwis + data.prof : data.modwis], 
-      [data.proficiencies.includes('performance') ? data.modcha + data.prof : data.modcha] 
-      [data.proficiencies.includes('survival') ? data.modwis + data.prof : data.modwis], 
-      [data.proficiencies.includes('deception') ? data.modcha + data.prof : data.modcha], 
-      [data.proficiencies.includes('intimidation') ? data.modcha + data.prof : data.modcha] ,
-      [data.proficiencies.includes('persuasion') ? data.modcha + data.prof : data.modcha] ,
-      [data.proficiencies.includes('religion') ? data.modint + data.prof : data.modint] ,
+      [data.proficiencies.includes('acrobatics') ? data.moddex + data.profbonus : data.moddex], 
+      [data.proficiencies.includes('arcane') ? data.modint + data.profbonus : data.modint],
+      [data.proficiencies.includes('athletics') ? data.modstr + data.profbonus : data.modstr], 
+      [data.proficiencies.includes('stealth') ? data.moddex + data.profbonus : data.moddex], 
+      [data.proficiencies.includes('animalhandling') ? data.modwis + data.profbonus : data.modwis], 
+      [data.proficiencies.includes('sleightofhand') ? data.moddex + data.profbonus : data.moddex], 
+      [data.proficiencies.includes('history') ? data.modint + data.profbonus : data.modint], 
+      [data.proficiencies.includes('insight') ? data.modwis + data.profbonus : data.modwis], 
+      [data.proficiencies.includes('investigation') ? data.modint + data.profbonus : data.modint], 
+      [data.proficiencies.includes('medecine') ? data.modwis + data.profbonus : data.modwis], 
+      [data.proficiencies.includes('nature') ? data.modint + data.profbonus : data.modint], 
+      [data.proficiencies.includes('perception') ? data.modwis + data.profbonus : data.modwis], 
+      [data.proficiencies.includes('performance') ? data.modcha + data.profbonus : data.modcha] 
+      [data.proficiencies.includes('survival') ? data.modwis + data.profbonus : data.modwis], 
+      [data.proficiencies.includes('deception') ? data.modcha + data.profbonus : data.modcha], 
+      [data.proficiencies.includes('intimidation') ? data.modcha + data.profbonus : data.modcha] ,
+      [data.proficiencies.includes('persuasion') ? data.modcha + data.profbonus : data.modcha] ,
+      [data.proficiencies.includes('religion') ? data.modint + data.profbonus : data.modint] ,
       [data.modwis] ,
       [data.modint] ,
       [data.modcon] ,
@@ -36,12 +36,12 @@ function fillPdf() {
       [data.modstr] ,
       [def2] ,
       ['+2'] ,
-      [data.profsaves.includes('strenght') ? data.modstr + data.prof : data.modstr] ,
-      [data.profsaves.includes('dexterity') ? data.moddex + data.prof : data.moddex] ,
-      [data.profsaves.includes('constitution') ? data.modcon + data.prof : data.modcon] , //data.prof ?
-      [data.profsaves.includes('intelligence') ? data.modint + data.prof : data.modint] ,
-      [data.profsaves.includes('wisdom') ? data.modwis + data.prof : data.modwis] ,
-      [data.profsaves.includes('charisma') ? data.modcha + data.prof : data.modcha] ,
+      [data.profsaves.includes('strenght') ? data.modstr + data.profbonus : data.modstr] ,
+      [data.profsaves.includes('dexterity') ? data.moddex + data.profbonus : data.moddex] ,
+      [data.profsaves.includes('constitution') ? data.modcon + data.profbonus : data.modcon] , 
+      [data.profsaves.includes('intelligence') ? data.modint + data.profbonus : data.modint] ,
+      [data.profsaves.includes('wisdom') ? data.modwis + data.profbonus : data.modwis] ,
+      [data.profsaves.includes('charisma') ? data.modcha + data.profbonus : data.modcha] ,
       [data.ac] ,
       [data.moddex] ,
       [data.speed],
@@ -112,7 +112,7 @@ function fillPdf() {
       ['0'] ,
       ['0'] ,
       [data.equipment] ,
-      [data.languages] ,  
+      [data.languages + data.itemproficiencies] ,  
       [data.charactername] ,
       [data.age] ,
       [data.height] ,
@@ -344,6 +344,8 @@ function fillPdf() {
     for (var i = 0; i < field_names.length; i++) {
       fields[field_names[i]] = field_values[i];
     }
+    console.log("Voici les fields");
+    console.log(fields);
   } catch (e) {
     console.error('Error:', e);
   }
@@ -398,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Fetch the JSON file
 function getData(){
-fetch('form_data_1712457923054.json')
+fetch('FormData/form_data_1712873033426.json')
   .then(response => {
     // Check if response is successful
     if (!response.ok) {
@@ -408,9 +410,9 @@ fetch('form_data_1712457923054.json')
     return response.json();
   })
   .then(data => {
-    // Data is now parsed JSON object
+    console.log("JSON sucessfully retrieved");
+    console.log(data);
     return data;
-    // You can access the data properties here
   })
   .catch(error => {
     console.error('There was a problem with the fetch operation:', error);

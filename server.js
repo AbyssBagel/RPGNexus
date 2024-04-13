@@ -16,7 +16,7 @@ app.use(express.static(__dirname));
 // Route for the homepage
 app.get('/', (req, res) => {
   console.log("Directed to Home Page")
-  res.sendFile(__dirname + '/home.html');
+  res.sendFile(__dirname + '/PdfFiller.html'); //A rechanger !!!!!!!!!!!!!!!!!!!!!
 });
 
 // Route for redirection

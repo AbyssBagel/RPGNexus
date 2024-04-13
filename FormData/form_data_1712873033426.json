@@ -43,7 +43,7 @@
     "conmod": 2,
     "intmod": 0,
     "wismod": 1,
-    "chamod": null,
+    "chamod": 2,
     "hitdice": 10,
     "hp": 12,
     "initiative": 0,
