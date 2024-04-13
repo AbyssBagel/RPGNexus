@@ -10,12 +10,16 @@
     "constitution": "15",
     "intelligence": "10",
     "wisdom": "12",
-    "chasrisma": "9",
+    "charisma": "9",
     "alignment": "le",
     "background": "acolyte",
     "proficiencies": [
         "athletics",
         "history"
+    ],
+    "profsaves": [
+        "strength",
+        "constitution"
     ],
     "flaw": "Too Perfect",
     "trait": "Kind",
