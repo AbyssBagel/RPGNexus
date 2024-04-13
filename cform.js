@@ -11,8 +11,6 @@ checkboxContainer.childNodes.forEach(function(child) {
 document.addEventListener('DOMContentLoaded', function() {
     // Get the class select element
     var classSelect = document.getElementById('class');
-    console.log(classSelect);
-    console.log(classSelect.value);
     //Add event listener on the class variable
     classSelect.addEventListener('change', function() {
         var selectedClass = this.value; // Get the selected class
@@ -141,8 +139,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-
-
 function CalculatePointBasedAbilityScore() {
     var pointsleft=27;
     var characteristicsDiv = document.getElementById('characteristics');
@@ -168,4 +164,24 @@ function CalculatePointBasedAbilityScore() {
         console.log("Points Left:", pointsleft);
         document.getElementById("Characstext").innerHTML = "Characteristics - Points left : " + pointsleft;}
     });
+}
+
+function SendFormToServer(){
+    console.log("Form submitted");
+    const formData = new FormData(document.getElementById('formuser'));
+    console.log(formData);
+    var formDatafromuser = {};
+    formData.forEach((value, key) => {
+        formDatafromuser[key] = value;
+    });
+    console.log(formDatafromuser);
+    fetch('/CharSubmit', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formDatafromuser)
+    })
+    .then(response => console.log(response.text()));
+    console.log("here I am");
 }
