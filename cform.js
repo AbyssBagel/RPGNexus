@@ -182,6 +182,9 @@ function SendFormToServer(){
         },
         body: JSON.stringify(formDatafromuser)
     })
-    .then(response => console.log(response.text()));
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+    });
     console.log("here I am");
 }
