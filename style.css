@@ -285,6 +285,8 @@ hr.style2 {
 .wrapper{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
+  grid-column-gap: 10px;
+  grid-row-gap: 10px;
   
 }
 
@@ -311,4 +313,10 @@ hr.style2 {
 .box6{
   grid-column: 2;
   grid-row: 3;
+}
+.box{
+  border: 5px solid #2980B9;
+  border-radius: 20px;
+  background-color: #ffd8a8;
+  padding: 2em;
 }
