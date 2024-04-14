@@ -82,7 +82,7 @@
                             <span class="d-block">Pick your Class first and then your Background then pick your skill proficiencies, not the other way around</span>
                         </h1>
                     </div>
-                    <form action="/CharSubmit" method="POST">
+                    <form id="formuser">
                         <div class="form-group">
                             <label for="pname">Player Name:</label>
                             <input type="text" id="pname" name="playername" class="form-control"><br>
@@ -128,8 +128,8 @@
                             <input type="number" id="intelligence" name="intelligence" min="8" max="15" value="8" class="form-control"><br>
                             <label for="wisdom">Wisdom:</label>
                             <input type="number" id="wisdom" name="wisdom" min="8" max="15" value="8" class="form-control"><br>
-                            <label for="chasrisma">Chasrisma:</label>
-                            <input type="number" id="charisma" name="chasrisma" min="8" max="15" value="8" class="form-control"><br>
+                            <label for="charisma">Charisma:</label>
+                            <input type="number" id="charisma" name="charisma" min="8" max="15" value="8" class="form-control"><br>
                         </div>
                         <br>
                         <div class="form-group">
@@ -273,8 +273,9 @@
                                 <textarea id="appearance" name="appearance" class="form-control"></textarea><br>
                             </div>
                         </div>
-                        <button type="submit">Submit</button>
+                        <button type="button" onclick="SendFormToServer()">Submit</button>
                     </form>
+                    <div id="responseMessagefromserver"></div>
                 </div>
             </div>
         </div>
@@ -299,9 +300,13 @@
             </div>
         </div>
     </footer>
-
     <script src="script.js"></script>
     <script src="cform.js"></script>
+    <script src="PdfFiller.js"></script>
+    <script src="./minipdf.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pako/1.0.3/pako.min.js"
+  integrity="sha256-X7u/eQo6oIgWqc5jOmTjQn3loM8Lse0ock76Gkkn/Ro=" crossorigin="anonymous"></script>
+    <script src="./pdfform.js"></script>
 </body>
 </html>
 
