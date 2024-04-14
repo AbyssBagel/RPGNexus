@@ -87,7 +87,6 @@
                                 <h2 class="d-block">Step 1 : Character Basics</h2>
                                 <label for="level"><b>Level</b></label><br>
                                 <input type="number" id="level" name="level" class="form-control" min="1" max="20" value="1"><br><br>
-
                                 <label for="race"><b>Race</b></label><br>
                                 <select id="race" name="race" class="form-control" default="">
                                     <option disabled selected value> -- select a race-- </option>
@@ -95,7 +94,6 @@
                                     <option value="elf">Elf</option>
                                     <option value="dwarf">Dwarf</option>
                                 </select><br>
-
                                 <label for="class"><b>Class</b></label><br>
                                 <select id="class" name="class" class="form-control" default="">
                                     <option disabled selected value> -- select a class -- </option>
@@ -138,11 +136,10 @@
                                     <input type="number" id="intelligence" name="intelligence" min="8" max="15" value="8" class="form-control"><br>
                                     <label for="wisdom">Wisdom:</label>
                                     <input type="number" id="wisdom" name="wisdom" min="8" max="15" value="8" class="form-control"><br>
-                                    <label for="chasrisma">Chasrisma:</label>
-                                    <input type="number" id="chasrisma" name="chasrisma" min="8" max="15" value="8" class="form-control"><br>
+                                    <label for="charisma">Charisma:</label>
+                                    <input type="number" id="charisma" name="charisma" min="8" max="15" value="8" class="form-control"><br>
                                 </div>
                             </div>
-
                             <div id="step3" class="form-group text-center box3 box">
                                 <h2 class="d-block">Step 3 : Skills and Proficiencies</h2>
                                 <div id="GivenSkillProfByBg"></div><br>
@@ -259,7 +256,9 @@
                                     <option value="cg">Chaotic Good</option>
                                     <option value="cn">Chaotic Neutral</option>
                                     <option value="ce">Chaotic Evil</option>
-                                </select>
+                                </select><br>
+                                <label for="chistory">Character History:</label>
+                                <input type="text" id="chistory" name="chistory" class="form-control"><br>
                                 <div id="AppearanceArea">
                                     <div class="form-group">
                                         <label for="age">Age:</label>
