@@ -8,6 +8,8 @@ const racespeedarray = {"dwarf":25,"elf":30,"human":30};
 const racetraits = {"dwarf":"Traits :\ndarkvision\ndwarven resilience\ndwarven combat training\nstonecunning\ndwarven toughness\n","elf":"Traits :\ndarkvision\nkeen senses\nfey ancestry\ntrance\n","human":"Traits : none\n"};
 const classabilities = {"wizard":"Abilities:\nSpellcasting\nCantrips\nSpellbook\nPreparing and Casting spells\nSpellcasting ability\nRitual Casting\nSpellcasting focus\nLearning Spells\nArcane Recovery\n","rogue":"Abilities:\nSneak Attack\nThieves' Cant\nCunning Action\n","fighter":"Abilities:\nFighting Style\nSecond Wind\n","paladin":"Abilities:\nDivine Sense\nLay on Hands\n"}
 const itemproficiency = {"barbarian":"light armor\nmedium armor\nshields\nsimple weapons\nmartial weapons\n","fighter":"all armor\nshields\nsimple weapons\nmartial weapons\n","paladin":"all armor\nshields\nsimple weapons\nmartial weapons","rogue":"light armor\nsimple weapons\nhand crossbows\nlongswords\nrapiers\nshortswords\n","wizard":"daggers\ndarts\nslings\nquarterstaffs\nlight crossbows\n"};
+const profsaves ={"wizard":['intelligence','wisdom'], "rogue":['dexterity','intelligence'], "fighter":['strength','constitution'], "paladin":['wisdom','charisma'], "barbarian":['strength','constitution'],"bard":['dexterity','charisma'],"cleric":['wisdom','charisma'],"druid":['intelligence','wisdom'],"monk":['dexterity','wisdom'],"ranger":['dexterity','wisdom'],"sorcerer":['constitution','charisma'],"warlock":['wisdom','charisma']}
+//var pdffiller = require('PdfFiller');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -33,9 +35,12 @@ app.post('/CharSubmit', (req, res) => {
   console.log("Form submitted successfully!")
   // Extract data from the form submission
   const formData = req.body;
+  console.log(formData);
   // Store data in a JSON file
-  storeFormData(formData);
-  res.send('Form submitted successfully!');
+  jsondata=storeFormData(formData);
+  console.log("jsondata is stored in the file and I'm back to the main function post");
+  console.log(jsondata);
+  res.send(jsondata);
 });
 
 function storeFormData(data) {
@@ -44,9 +49,7 @@ function storeFormData(data) {
   var jsondata = JSON.stringify(data);
   jsondata=JSON.parse(jsondata);
   const directory = path.join(__dirname, 'FormData');
-  //console.log(jsondata);
   jsondata2 = AddInfoToJson(jsondata);
-  //console.log(jsondata2);
 
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory);
@@ -63,36 +66,11 @@ function storeFormData(data) {
           console.log('Form data stored successfully in:', filename);
       }
   });
+  return jsondata2;
 }
 
-
 function AddInfoToJson(jsondata){
-  switch(jsondata['class']){
-    case "Barbarian":
-      jsondata['profsaves']=['strength','constitution']
-    case "Bard":
-      jsondata['profsaves']=['dexterity','charisma']
-    case "Cleric":
-      jsondata['profsaves']=['wisdom','charisma']
-    case "Druid":
-      jsondata['profsaves']=['intelligence','wisdom']
-    case "Fighter":
-      jsondata['profsaves']=['strength','constitution']
-    case "Monk":
-      jsondata['profsaves']=['dexterity','wisdom']
-    case "Paladin":
-      jsondata['profsaves']=['wisdom','charisma']
-    case "Ranger":
-      jsondata['profsaves']=['dexterity','wisdom']
-    case "Rogue":
-      jsondata['profsaves']=['dexterity','intelligence']
-    case "Sorcerer":
-      jsondata['profsaves']=['constitution','charisma']
-    case "Warlock":
-      jsondata['profsaves']=['wisdom','charisma']
-    case "Wizard":
-      jsondata['profsaves']=['intelligence','wisdom']
-  }
+  jsondata['profsaves'] = profsaves[jsondata['class']];
   jsondata['profbonus'] = Math.floor(jsondata['level']/4)+2
   jsondata['strmod'] = Math.floor((jsondata['strength']-10)/2);
   jsondata['dexmod'] = Math.floor((jsondata['dexterity']-10)/2);
@@ -110,6 +88,7 @@ function AddInfoToJson(jsondata){
   jsondata['traitsabilities'] = traits + abilities;
   jsondata['itemproficiencies'] = itemproficiency[jsondata['class']];
   console.log(jsondata);
+
   return jsondata;
 }
 
