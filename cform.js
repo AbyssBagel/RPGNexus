@@ -302,7 +302,7 @@ function fillPdf2(data){
       ['0'] ,
       ['0'] ,
       [data.equipment] ,
-      [data.languages + '\n' + data.itemproficiencies] ,  
+      ['Languages:\n'+data.languages + '\n' + 'Proficiencies:\n'+data.itemproficiencies] ,  
       [data.charactername] ,
       [data.age] ,
       [data.height] ,
