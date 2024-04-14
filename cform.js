@@ -15,26 +15,25 @@ document.addEventListener('DOMContentLoaded', function() {
     //Add event listener on the class variable
     classSelect.addEventListener('change', function() {
         var selectedClass = this.value; // Get the selected class
-
         // Show or hide proficiency checkboxes
         var proficiencyCheckboxes = document.querySelectorAll('#checkbox-proficiencies input[type="checkbox"]');
         proficiencyCheckboxes.forEach(function(checkbox) {
             // Check if the checkbox should be hidden
             if (selectedClass === 'fighter' && (checkbox.id === 'acrobatics' || checkbox.id === 'animalhandling' || checkbox.id === 'athletics' || checkbox.id === 'history' || checkbox.id === 'insight' || checkbox.id === 'intimidation'  || checkbox.id === 'perception'  || checkbox.id === 'survival')) {
-                checkbox.style.display = 'block'; // Show the checkbox
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                checkbox.style.display = 'inline-block'; // Show the checkbox
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
             }
             else if (selectedClass === 'wizard' && (checkbox.id === 'deception' || checkbox.id === 'insight' || checkbox.id === 'performance' || checkbox.id === 'persuasion' || checkbox.id === 'perception' || checkbox.id === 'stealth'  || checkbox.id === 'acrobatics'  || checkbox.id === 'sleightofhand')) {
-                checkbox.style.display = 'block'; // Show the checkbox
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                checkbox.style.display = 'inline-block'; // Show the checkbox
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
             }
             else if (selectedClass === 'paladin' && (checkbox.id === 'athletics' || checkbox.id === 'insight' || checkbox.id === 'intimidation' || checkbox.id === 'medicine' || checkbox.id === 'persuasion' || checkbox.id === 'religion')) {
-                checkbox.style.display = 'block'; // Show the checkbox
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                checkbox.style.display = 'inline-block'; // Show the checkbox
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
             }
             else if (selectedClass === 'rogue' && (checkbox.id === 'acrobatics' || checkbox.id === 'athletics' || checkbox.id === 'deception' || checkbox.id === 'insight' || checkbox.id === 'intimidation' || checkbox.id === 'investigation' || checkbox.id === 'perception' || checkbox.id === 'performance' || checkbox.id === 'persuasion')) {
-                checkbox.style.display = 'block'; // Show the checkbox
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                checkbox.style.display = 'inline-block'; // Show the checkbox
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
             } else {
                 checkbox.style.display = 'none'; // Hide the checkbox
                 checkbox.checked=false;
@@ -64,64 +63,64 @@ document.addEventListener('DOMContentLoaded', function() {
             //Uncheck every checkbox
             checkbox.checked=false;
             if (selectedbg === 'acolyte' && (checkbox.id === 'insight' || checkbox.id === 'religion')) {
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Insight, Religion";
             }else if(selectedbg ==='charlatan' && (checkbox.id === 'deception' || checkbox.id === 'sleightofhand')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Deception, Sleight of hand";
             }else if(selectedbg ==='criminal' && (checkbox.id === 'deception' || checkbox.id === 'stealth')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Deception, Stealth";
             }else if(selectedbg ==='entertainer' && (checkbox.id === 'acrobatics' || checkbox.id === 'performance')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Acrobatics, Performance";
             }else if(selectedbg ==='folkhero' && (checkbox.id === 'animalhandling' || checkbox.id === 'survival')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Animal Handling, Survival";
             }else if(selectedbg ==='guildartisan' && (checkbox.id === 'insight' || checkbox.id === 'persuasion')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Insight, Persuasion";
             }else if(selectedbg ==='hermit' && (checkbox.id === 'medicine' || checkbox.id === 'religion')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Medicine, Religion";
             }else if(selectedbg ==='noble' && (checkbox.id === 'history' || checkbox.id === 'persuasion')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : History, Persuasion";
             }else if(selectedbg ==='outlander' && (checkbox.id === 'athletics' || checkbox.id === 'survival')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Athletics, Survival";
             }else if(selectedbg ==='sage' && (checkbox.id === 'arcana' || checkbox.id === 'history')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Arcana, History";
             }else if(selectedbg==='soldier' && (checkbox.id === 'athletics' || checkbox.id === 'intimidation')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Athletics, Intimidation";
             }else if(selectedbg==='urchin' && (checkbox.id === 'sleightofhand' || checkbox.id === 'stealth')){
-                checkbox.style.display = 'block'; // Show the checkbox
+                checkbox.style.display = 'inline-block'; // Show the checkbox
                 checkbox.checked=true;
-                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'block';
+                document.querySelector('label[for="' + checkbox.id + '"]').style.display = 'inline-block';
                 document.getElementById("GivenSkillProfByBg").innerHTML= "Skill proficiency given by your background : Sleight of hand, Stealth";
             }
             changenumberofproficiency();
@@ -327,7 +326,7 @@ function fillPdf2(data){
       [data.appearance] ,
       [def1] ,
       [def1] ,
-      [def1] ,
+      [data.chistory] ,
       [def1] ,
       [def1] ,
       [def1] ,

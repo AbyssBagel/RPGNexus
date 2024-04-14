@@ -128,7 +128,7 @@ function fillPdf2(data){
     [data.appearance] ,
     [def1] ,
     [def1] ,
-    [def1] ,
+    [data.chistory] ,
     [def1] ,
     [def1] ,
     [def1] ,
