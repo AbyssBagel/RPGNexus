@@ -7,8 +7,19 @@ hr.style1 {
     border-radius: 5px;
   }
 
+body {
+  color: #fff;
+  font-size: 11pt;
+  font-family: Verdana,Helvetica,Arial,sans-serif;
+  background: #344b6c url(images/DND.png) no-repeat left center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover
+}
+
 hr.style2 {
-    border: 3px solid red;
+    border: 3px solid rgb(255, 0, 0);
     border-radius: 5px;
   }
 
@@ -279,7 +290,7 @@ hr.style2 {
     font-weight: 700;
     line-height: 1.2;
     margin-bottom: 20px;
-    color: #c91f1f;
+    color: #ffffff;
 }
 
 .wrapper{
@@ -315,8 +326,9 @@ hr.style2 {
   grid-row: 3;
 }
 .box{
-  border: 5px solid #2980B9;
+  border: 5px solid #cfc13e;
   border-radius: 20px;
-  background-color: #ffd8a8;
+  background-color: #1d1c1c;
+  opacity: 0.97;
   padding: 2em;
 }
