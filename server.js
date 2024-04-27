@@ -18,17 +18,48 @@ app.use(express.static(__dirname));
 // Route for the homepage
 app.get('/', (req, res) => {
   console.log("Directed to Home Page")
-  res.sendFile(__dirname + '/home.html');
+  res.sendFile(__dirname + '/html/home.html');
 });
 
 // Route for redirection
 app.get('/redirect', (req, res) => {
-  res.redirect('/home.html');
+  res.redirect('/html/home.html');
 });
 
+// Route for error 404 page
+app.get('/error', (req, res) => {
+  console.log("Directed to error page")
+  res.sendFile('/html/404.html', { root: __dirname });
+});
+
+// Route for login page
 app.get('/login', (req, res) => {
   console.log("Directed to login page")
-  res.sendFile('login.html', { root: __dirname });
+  res.sendFile('/html/login.html', { root: __dirname });
+});
+
+// Route for about page
+app.get('/about', (req, res) => {
+  console.log("Directed to about page")
+  res.sendFile('/html/about.html', { root: __dirname });
+});
+
+// Route for contact page
+app.get('/contact', (req, res) => {
+  console.log("Directed to contact page")
+  res.sendFile('/html/contact.html', { root: __dirname });
+});
+
+// Route for gcu page
+app.get('/gcu', (req, res) => {
+  console.log("Directed to gcu page")
+  res.sendFile('/html/gcu.html', { root: __dirname });
+});
+
+// Route for character creation page
+app.get('/dnd-form', (req, res) => {
+  console.log("Directed to character creation page")
+  res.sendFile('/html/character_form.html', { root: __dirname });
 });
 
 app.post('/CharSubmit', (req, res) => {

@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Home</title>
-    <link href="style.css" rel="stylesheet" type="text/css" />
-    <style>
-        body {
-            font-family: 'Didact Gothic', sans-serif;
-        }
-    </style>
+  <title>Login</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <style>
+    body {
+        font-family: 'Didact Gothic', sans-serif;
+    }
+  </style>
 </head>
 <body>
     <header id="header" class="header">
@@ -16,21 +16,9 @@
                 <div class="up-row">
                     <div class="up-row-collapse">
                         <ul class="logo" style="padding-left: 20px;"> 
-                            <a href="home.html">
+                            <a href="/">
                                 <img src="images/icon.png" width=400px/>
                             </a>
-                        </ul>
-                        <ul class="login order-1" style="padding-left: 0px;padding-right: 50px;">
-                            <!--{% if user.is_authenticated %}
-                                <a href="404.html">{{ user.id }}</a>
-                            {% else %}-->
-                                <li class="dropdown">
-                                    <button onclick="loginMenu()" class="dropbtn">Login</button>
-                                    <div id="loginMenu" class="login-content">
-                                        <a href="login.html">Login</a>
-                                        <a href="404.html">Register</a>
-                                </li>
-                            <!--{% endif %}-->
                         </ul>
                     </div>
                 </div>
@@ -44,7 +32,7 @@
                             <i class="fa fa-caret-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="404.html">Introduction + Our Thoughts</a>
+                            <a href="error">Introduction + Our Thoughts</a>
                             <a href="https://dnd.wizards.com" target="_blank">Official website</a>
                         </div>
                     </div>
@@ -53,7 +41,7 @@
                             <i class="fa fa-caret-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="404.html">Introduction + Our Thoughts</a>
+                            <a href="error">Introduction + Our Thoughts</a>
                             <a href="https://www.youtube.com/watch?v=sP1HIWyv8DI" target="_blank">Fast Start & Introduction</a>
                         </div>
                     </div>
@@ -62,7 +50,7 @@
                             <i class="fa fa-caret-down"></i>
                         </button>
                         <div class="dropdown-content">
-                            <a href="404.html">Introduction + Our Thoughts</a>
+                            <a href="error">Introduction + Our Thoughts</a>
                             <a href="https://www.youtube.com/watch?v=uddCmjd3R4M" target="_blank">Why should you play Adventures in Middle Earth?</a>
                         </div>
                     </div>
@@ -70,36 +58,37 @@
             </div>    
         </div>
     </header>
-    <section id="intro" class="intro position-relative">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-lg-5">
-                    <div class="intro-title">
-                        <h1 class="d-block">
-                            <span class="d-block">Welcome to the best TTRPG website tool,</span>
-                            <span class="d-block">Create and manage your now character now !</span>
-                        </h1>
-                    </div>
-                    <div class="intro_btn">
-                        <a href="character_form.html" class="intro-btn">Create your character</a>
-                    </div>
-                </div>
+
+    <div class="container">
+        <h2>Login</h2>
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter your username">
             </div>
-        </div>
-    </section>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter your password">
+            </div>
+            <div class="form-group">
+                <button type="submit">Login</button>
+            </div>
+        </form>
+    </div>
+
     <footer id="footer" class="footer">
         <div class="footer_copyright py-3">
             <div class="container">
                 <div class="row">
                     <hr class="col-2 text-center order-1">
                     <div class="col-12 text-center order-0">
-                        <a href="aboutus.html">About us</a>
+                        <a href="about">About us</a>
                          | 
-                        <a href="contactus.html">Contact us</a>
+                        <a href="contact">Contact us</a>
                     </div>
                     <div class="col-12 text-center order-2">
                         <span class="d-block">
-                            <a href="GCU.html">General Conditions of Use (GCU)</a>
+                            <a href="gcu">General Conditions of Use (GCU)</a>
                         </span>
                         <span class="d-block">@ 2024 RPGNexus. All rights reserved</span>
                     </div>
@@ -107,6 +96,5 @@
             </div>
         </div>
     </footer>
-    <script src="script.js"></script>
 </body>
 </html>
