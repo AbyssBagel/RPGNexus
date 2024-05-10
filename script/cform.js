@@ -202,9 +202,8 @@ function SendFormToServer(){
     console.log("here I am");
 }
 
-//Faye Code that I need to implement
 
-var pdfBuffer= "./FeuillePersoDD5.pdf";
+var pdfBuffer= "/pdf/FeuillePersoDD5.pdf";
 
 function fillPdf2(data){
     console.log("I'm in the fillPdf2 function");
@@ -544,7 +543,7 @@ function fillPdf2(data){
       [def2],
       [def1] ,
       ];
-  
+    console.log(field_names);
     for (var i = 0; i < field_names.length; i++) {
       fields[field_names[i]] = field_values[i];
     }
@@ -578,6 +577,6 @@ function fillPdf2(data){
       console.log('Fields:', field_names);
       return field_names;
     } catch (e) {
-      on_error(e);
+      console.log(e);
     }
   }
