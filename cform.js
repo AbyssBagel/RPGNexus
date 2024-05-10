@@ -199,7 +199,6 @@ function SendFormToServer(){
     .then(data => {
         fillPdf2(data);
     });
-    console.log("here I am");
 }
 
 //Faye Code that I need to implement
@@ -207,7 +206,6 @@ function SendFormToServer(){
 var pdfBuffer= "./FeuillePersoDD5.pdf";
 
 function fillPdf2(data){
-    console.log("I'm in the fillPdf2 function");
     var fields = {};
     var field_names = list_fields(pdfBuffer);
     var def1 = '';
@@ -575,7 +573,6 @@ function fillPdf2(data){
       for (var field_key in field_specs) {
         field_names.push(field_key);
       }
-      console.log('Fields:', field_names);
       return field_names;
     } catch (e) {
       on_error(e);
