@@ -1,4 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
+import './HomePage.scss';
 
 const HomePage = () => {
   return (
@@ -13,9 +16,9 @@ const HomePage = () => {
               </h1>
             </div>
             <div className='intro_btn'>
-              <a href='dnd-form' className='intro-btn'>
+              <Link to='/dnd-form' className='intro-btn'>
                 Create your character
-              </a>
+              </Link>
             </div>
           </div>
         </div>
