@@ -14,9 +14,11 @@ To setup the project locally, follow theses steps :
 
 To contribute, Eslint and Prettier extensions in VsCode are strongly recommended. Also you'll first need to run the following scripts :
 
+```
 npm run lint
 npm run lint:fix
 npm run format
+```
 
 ### Starting project
 
