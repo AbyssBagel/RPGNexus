@@ -1,6 +1,6 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import './Row.scss';
+import React from 'react'
+import PropTypes from 'prop-types'
+import './Row.scss'
 
 const Row = ({ children, mb, mt, ml, mr, pb, pt, pl, pr, gap, justifyContent, alignItems }) => {
   const style = {
@@ -15,14 +15,14 @@ const Row = ({ children, mb, mt, ml, mr, pb, pt, pl, pr, gap, justifyContent, al
     '--gap': gap,
     '--justify-content': justifyContent,
     '--align-items': alignItems,
-  };
+  }
 
   return (
-    <div className='row' style={style}>
+    <div className="row" style={style}>
       {children}
     </div>
-  );
-};
+  )
+}
 
 Row.propTypes = {
   children: PropTypes.node.isRequired,
@@ -37,7 +37,7 @@ Row.propTypes = {
   gap: PropTypes.string,
   justifyContent: PropTypes.string,
   alignItems: PropTypes.string,
-};
+}
 
 Row.defaultProps = {
   mb: '0',
@@ -51,6 +51,6 @@ Row.defaultProps = {
   gap: '0',
   justifyContent: 'flex-start',
   alignItems: 'stretch',
-};
+}
 
-export default Row;
+export default Row
