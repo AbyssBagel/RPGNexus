@@ -16,7 +16,7 @@ const HomePage = () => {
               </h1>
             </div>
             <div className="intro_btn">
-              <Link to="/dnd-form" className="intro-btn">
+              <Link to="/characters/builder/dnd" className="intro-btn">
                 Create your character
               </Link>
             </div>
