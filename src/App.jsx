@@ -3,9 +3,10 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
 import Root from '@/Routes/root'
 import NotFoundPage from '@/Routes/NotFound/notFoundPage'
+import CharacterCreation from '@/Routes/Characters/CharacterCreation'
+import UsersLogin from '@/Routes/Users/UsersLogin'
 
 import HomePage from '@/Components/Home/HomePage'
-import CharacterCreation from '@/Routes/Characters/CharacterCreation'
 
 const router = createBrowserRouter([
   {
@@ -13,6 +14,15 @@ const router = createBrowserRouter([
     element: <Root />,
     children: [
       { index: true, element: <HomePage /> },
+      {
+        path: 'users',
+        children: [
+          {
+            path: 'login',
+            element: <UsersLogin />,
+          },
+        ],
+      },
       {
         path: 'characters',
         children: [
@@ -30,10 +40,6 @@ const router = createBrowserRouter([
             element: <></>,
           },
         ],
-      },
-      {
-        path: 'dashboard',
-        element: <></>,
       },
       {
         path: 'about',
