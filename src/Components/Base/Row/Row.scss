@@ -1,0 +1,15 @@
+.row {
+  display: flex;
+  margin: var(--m);
+  margin-bottom: var(--mb);
+  margin-top: var(--mt);
+  margin-left: var(--ml);
+  margin-right: var(--mr);
+  padding-bottom: var(--pb);
+  padding-top: var(--pt);
+  padding-left: var(--pl);
+  padding-right: var(--pr);
+  gap: var(--gap);
+  justify-content: var(--justify-content);
+  align-items: var(--align-items);
+}

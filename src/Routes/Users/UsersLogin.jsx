@@ -1,11 +1,12 @@
 import React from 'react'
-import Box from '../../Components/Base/Box/Box'
+
+import LoginForm from '../../Components/Users/Login/LoginForm'
 
 const UsersLogin = () => {
   return (
-    <div>
-      <Box>Coucou</Box>
-    </div>
+    <>
+      <LoginForm />
+    </>
   )
 }
 

@@ -1,0 +1,45 @@
+@import '../../../index.scss';
+
+.form-group {
+  margin: 10px 10px 15px 10px;
+
+  label {
+    display: block;
+    margin-bottom: 5px;
+    color: $primary-color;
+    font-weight: bold;
+  }
+
+  input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid lighten($primary-color, 30%);
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 16px;
+
+    &:focus {
+      border-color: $primary-color;
+      outline: none;
+      box-shadow: 0 0 5px rgba($primary-color, 0.3);
+    }
+  }
+}
+
+.form-button {
+  display: inline-block;
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: $primary-color;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: darken($primary-color, 10%);
+  }
+}

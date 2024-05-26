@@ -7,7 +7,7 @@ const Box = ({ children }) => {
 }
 
 Box.propTypes = {
-  children: PropTypes.node,
+  children: PropTypes.node.isRequired,
 }
 
 export default Box
