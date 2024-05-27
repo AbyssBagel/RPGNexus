@@ -1,11 +1,11 @@
 import React from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 
-import Root from './Routes/root'
-import NotFoundPage from './Routes/NotFound/notFoundPage'
+import Root from '@/Routes/root'
+import NotFoundPage from '@/Routes/NotFound/notFoundPage'
 
-import HomePage from './Components/Home/HomePage'
-import CharacterCreation from './Routes/Characters/CharacterCreation'
+import HomePage from '@/Components/Home/HomePage'
+import CharacterCreation from '@/Routes/Characters/CharacterCreation'
 
 const router = createBrowserRouter([
   {
