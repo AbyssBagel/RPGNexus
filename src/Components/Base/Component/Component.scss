@@ -1,0 +1,159 @@
+$prefix: 'rpg';
+$sizes: (
+  '0': 0,
+  'xs': 8px,
+  'sm': 16px,
+  'md': 24px,
+  'lg': 32px,
+  'xl': 48px,
+  'xxl': 64px,
+  '3xl': 96px
+);
+$sides: (
+  '': ('top', 'right', 'bottom', 'left'),
+  'x': ('left', 'right'),
+  'y': ('top', 'bottom'),
+  't': ('top'),
+  'r': ('right'),
+  'b': ('bottom'),
+  'l': ('left')
+);
+
+@each $sizeKey, $sizeValue in $sizes {
+  .#{$prefix}-p-#{$sizeKey} {
+    padding: $sizeValue;
+  }
+  .#{$prefix}-m-#{$sizeKey} {
+    margin: $sizeValue !important;
+  }
+
+  @each $sideKey, $sideValue in $sides {
+    .#{$prefix}-p#{$sideKey}-#{$sizeKey} {
+      @each $side in $sideValue {
+        padding-#{$side}: $sizeValue;
+      }
+    }
+
+    .#{$prefix}-m#{$sideKey}-#{$sizeKey} {
+      @each $side in $sideValue {
+        margin-#{$side}: $sizeValue !important;
+      }
+    }
+  }
+}
+
+$rpg-alignments: (
+  'flex-start': flex-start,
+  'center': center,
+  'flex-end': flex-end,
+  'stretch': stretch,
+  'baseline': baseline
+);
+
+$rpg-justifications: (
+  'flex-start': flex-start,
+  'center': center,
+  'flex-end': flex-end,
+  'space-between': space-between,
+  'space-around': space-around,
+  'space-evenly': space-evenly
+);
+
+@each $alignment, $value in $rpg-alignments {
+  .#{$prefix}-align-#{$alignment} {
+    align-items: $value;
+  }
+}
+
+@each $justification, $value in $rpg-justifications {
+  .#{$prefix}-justify-#{$justification} {
+    justify-content: $value;
+  }
+}
+
+.rpg-container {
+  display: flex;
+}
+
+//--------------------------- Row ---------------------------
+.rpg-row {
+    display: flex;
+    flex-direction: wrap;
+    margin: 0 -8px;
+  }
+
+$rpg-alignments: (
+  'flex-start': flex-start,
+  'center': center,
+  'flex-end': flex-end,
+  'stretch': stretch,
+  'baseline': baseline
+);
+
+$rpg-justifications: (
+  'flex-start': flex-start,
+  'center': center,
+  'flex-end': flex-end,
+  'space-between': space-between,
+  'space-around': space-around,
+  'space-evenly': space-evenly
+);
+
+@each $alignment, $value in $rpg-alignments {
+  .#{$prefix}-align-#{$alignment} {
+    align-items: $value;
+  }
+}
+
+@each $justification, $value in $rpg-justifications {
+  .#{$prefix}-justify-#{$justification} {
+    justify-content: $value;
+  }
+}
+
+//--------------------------- Col ---------------------------
+
+.#{$prefix}-col {
+    margin: 0 8px;
+
+    &-1 {
+        flex-basis: 8.33%;
+    }
+    &-2 {
+        flex-basis: 16.66%;
+    }
+    &-3 {
+        flex-basis: 25%;
+    }
+    &-4 {
+        flex-basis: 33.33%;
+    }
+    &-5 {
+        flex-basis: 41.66%;
+    }
+    &-6 {
+        flex-basis: 50%;
+    }
+    &-7 {
+        flex-basis: 58.33%;
+    }
+    &-8 {
+        flex-basis: 66.66%;
+    }
+    &-9 {
+        flex-basis: 75%;
+    }
+    &-10 {
+        flex-basis: 83.33%;
+    }
+    &-11 {
+        flex-basis: 91.66%;
+    }
+    &-12 {
+        flex-basis: 100%;
+    }
+    &-auto {
+        display: inline-flex
+    }
+}
+
