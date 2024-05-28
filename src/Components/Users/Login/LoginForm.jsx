@@ -1,6 +1,6 @@
 import React from 'react'
 import Box from '../../Base/Box/Box'
-import Row from 'react-bootstrap/Row'
+import Row from '@/Components/Base/Row/Row'
 //import Col from 'react-bootstrap/Col'
 
 import './LoginForm.scss'
