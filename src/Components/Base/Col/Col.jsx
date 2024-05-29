@@ -2,10 +2,11 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Component from '../Component/Component'
 
-const Row = ({ children, justifyContent, alignItems, ...props }) => {
-  const defaultProps = Row.defaultProps
+const Col = ({ children, justifyContent, alignItems, lg, ...props }) => {
+  const defaultProps = Col.defaultProps
   const className = [
-    'rpg-row',
+    'rpg-col',
+    lg && (lg === 'auto' ? 'rpg-col-auto' : `rpg-col-${lg}`),
     justifyContent !== defaultProps.justifyContent && `rpg-justify-${justifyContent}`,
     alignItems !== defaultProps.alignItems && `rpg-align-${alignItems}`,
   ]
@@ -19,15 +20,16 @@ const Row = ({ children, justifyContent, alignItems, ...props }) => {
   )
 }
 
-Row.propTypes = {
+Col.propTypes = {
   children: PropTypes.node.isRequired,
+  lg: PropTypes.oneOfType([PropTypes.number, PropTypes.oneOf(['auto'])]),
   justifyContent: PropTypes.string,
   alignItems: PropTypes.string,
 }
 
-Row.defaultProps = {
+Col.defaultProps = {
   justifyContent: 'flex-start',
   alignItems: 'stretch',
 }
 
-export default Row
+export default Col
