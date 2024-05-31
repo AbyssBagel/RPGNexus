@@ -3,26 +3,25 @@ import PropTypes from 'prop-types'
 import './Component.scss'
 
 const Component = ({ children, style, ...props }) => {
-  const defaultProps = Component.defaultProps
   const { m, p, mb, mt, ml, mr, pb, pt, pl, pr, mx, my, px, py, gap } = props
 
   const className = [
     ...style,
-    m !== defaultProps.m && `rpg-m-${m}`,
-    p !== defaultProps.p && `rpg-p-${p}`,
-    mb !== defaultProps.mb && `rpg-mb-${mb}`,
-    mt !== defaultProps.mt && `rpg-mt-${mt}`,
-    ml !== defaultProps.ml && `rpg-ml-${ml}`,
-    mr !== defaultProps.mr && `rpg-mr-${mr}`,
-    pb !== defaultProps.pb && `rpg-pb-${pb}`,
-    pt !== defaultProps.pt && `rpg-pt-${pt}`,
-    pl !== defaultProps.pl && `rpg-pl-${pl}`,
-    pr !== defaultProps.pr && `rpg-pr-${pr}`,
-    mx !== defaultProps.mx && `rpg-mx-${mx}`,
-    my !== defaultProps.my && `rpg-my-${my}`,
-    px !== defaultProps.px && `rpg-px-${px}`,
-    py !== defaultProps.py && `rpg-py-${py}`,
-    gap !== defaultProps.gap && `rpg-gap-${gap}`,
+    m !== null && `rpg-m-${m}`,
+    p !== null && `rpg-p-${p}`,
+    mb !== '0' && `rpg-mb-${mb}`,
+    mt !== '0' && `rpg-mt-${mt}`,
+    ml !== '0' && `rpg-ml-${ml}`,
+    mr !== '0' && `rpg-mr-${mr}`,
+    pb !== '0' && `rpg-pb-${pb}`,
+    pt !== '0' && `rpg-pt-${pt}`,
+    pl !== '0' && `rpg-pl-${pl}`,
+    pr !== '0' && `rpg-pr-${pr}`,
+    mx !== null && `rpg-mx-${mx}`,
+    my !== null && `rpg-my-${my}`,
+    px !== null && `rpg-px-${px}`,
+    py !== null && `rpg-py-${py}`,
+    gap !== '0' && `rpg-gap-${gap}`,
   ]
     .filter(Boolean)
     .join(' ')
@@ -48,25 +47,6 @@ Component.propTypes = {
   px: PropTypes.string,
   py: PropTypes.string,
   gap: PropTypes.string,
-}
-
-Component.defaultProps = {
-  style: [],
-  m: null,
-  p: null,
-  mb: '0',
-  mt: '0',
-  ml: '0',
-  mr: '0',
-  pb: '0',
-  pt: '0',
-  pl: '0',
-  pr: '0',
-  mx: null,
-  my: null,
-  px: null,
-  py: null,
-  gap: '0',
 }
 
 export default Component

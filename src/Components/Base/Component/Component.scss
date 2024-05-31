@@ -78,8 +78,14 @@ $rpg-justifications: (
 //--------------------------- Row ---------------------------
 .rpg-row {
     display: flex;
-    flex-direction: wrap;
+    flex: 1;
     margin: 0 -8px;
+  }
+
+.rpg-row > :first-child {
+    display: flex;
+    flex: 1;
+    margin: 0 8px;
   }
 
 $rpg-alignments: (

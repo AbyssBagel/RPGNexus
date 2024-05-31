@@ -1,67 +1,33 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import './NavBar.scss'
+import Row from '../Base/Row/Row'
+import { Link } from 'react-router-dom'
 
-const NavBar = () => {
+function NavBar({ titles, dropdown }) {
   return (
-    <div className="navbar">
-      <div className="dropdown2">
-        <button className="dropbtn2">
-          Dungeon & Dragons
-          <i className="fa fa-caret-down"></i>
-        </button>
-        <div className="dropdown-content">
-          <a href="error">Introduction + Our Thoughts</a>
-          <a href="https://dnd.wizards.com" target="_blank" rel="noreferrer">
-            Official website
-          </a>
-        </div>
+    <Row>
+      <div className="rpg-navbar">
+        {titles.map((title, index) => (
+          <div key={index} className="rpg-dropdown">
+            <button className="rpg-dropbtn">{title}</button>
+            <div className="rpg-dropdown-content">
+              {dropdown[index].map((item, index) => (
+                <Link key={index} to={item.link}>
+                  {item.name}
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="dropdown2">
-        <button className="dropbtn2">
-          Pathfinder
-          <i className="fa fa-caret-down"></i>
-        </button>
-        <div className="dropdown-content">
-          <a href="error">Introduction + Our Thoughts</a>
-          <a href="https://www.youtube.com/watch?v=sP1HIWyv8DI" target="_blank" rel="noreferrer">
-            Fast Start & Introduction
-          </a>
-        </div>
-      </div>
-      <div className="dropdown2">
-        <button className="dropbtn2">
-          Lord of the Rings : Adventure in Middle Earth
-          <i className="fa fa-caret-down"></i>
-        </button>
-        <div className="dropdown-content">
-          <a href="error">Introduction + Our Thoughts</a>
-          <a href="https://www.youtube.com/watch?v=uddCmjd3R4M" target="_blank" rel="noreferrer">
-            Why should you play Adventures in Middle Earth?
-          </a>
-        </div>
-      </div>
-      <div className="dropdown2">
-        <button className="dropbtn2">
-          Players&apos; Tools
-          <i className="fa fa-caret-down"></i>
-        </button>
-        <div className="dropdown-content">
-          <a href="error">Introduction</a>
-          <a href="dnd-form">Character Creation</a>
-        </div>
-      </div>
-      <div className="dropdown2">
-        <button className="dropbtn2">
-          Game Masters&apos; Tools
-          <i className="fa fa-caret-down"></i>
-        </button>
-        <div className="dropdown-content">
-          <a href="error">Introduction</a>
-          <a href="error">blabla</a>
-        </div>
-      </div>
-    </div>
+    </Row>
   )
+}
+
+NavBar.propTypes = {
+  titles: PropTypes.array,
+  dropdown: PropTypes.array,
 }
 
 export default NavBar
